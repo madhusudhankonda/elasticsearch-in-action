@@ -56,3 +56,30 @@ GET /_count
 
 #You can also use a wildcard too
 GET b*/_count
+
+# Fetching the document by its ID
+GET books/_doc/1
+
+# To fetch source only
+GET books/_source/1
+
+# To fetch multiple documents give a set of IDs using ids query
+GET books/_search
+{
+  "query": {
+    "ids": {
+      "values": [1,2,3]
+    }
+  }
+}
+# Turn off the source 
+GET books/_search
+{
+  "_source": false, 
+  "query": {
+    "ids": {
+      "values": [1,2,3]
+    }
+  }
+}
+
