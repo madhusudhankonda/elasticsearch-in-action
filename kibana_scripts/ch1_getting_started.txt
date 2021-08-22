@@ -82,4 +82,462 @@ GET books/_search
     }
   }
 }
+# Retrieving all documents in one go from the books index
+GET books/_search
 
+# Searching for books by an author
+GET books/_search
+{
+  "query": {
+    "match": {
+      "author": "Joshua"
+    }
+  }
+}
+
+# Search using different cased letters
+GET books/_search
+{
+  "query": {
+    "match": {
+      "author": "JoShUa"
+    }
+  }
+}
+
+# Search using surname
+GET books/_search
+{
+  "query": {
+    "match": {
+      "author": "Bloch"
+    }
+  }
+}
+
+# Searching like regex won't return retun results
+GET books/_search
+{
+  "query": {
+    "match": {
+      "author": "Josh"
+    }
+  }
+}
+
+# Searching like regex with prefix query - make sure the criteria is lowercased 
+GET books/_search
+{
+  "query": {
+    "prefix": {
+      "author": "josh"
+    }
+  }
+}
+
+#Searching for different keywords will still bring the results 
+GET books/_search
+{
+  "query": {
+    "match": {
+      "author": {
+        "query": "Joshua Sarikonda"
+      }
+    }
+  }
+}
+GET books/_search
+{
+  "query": {
+   "match": {
+     "author": "Joshua Schildt"
+   }
+  }
+}
+
+#Searching for different keywords with an operator 
+GET books/_search
+{
+  "query": {
+    "match": {
+      "author": {
+        "query": "Joshua Herbert"
+      }
+    }
+  }
+}
+
+GET books/_search
+{
+  "query": {
+    "match": {
+      "author": {
+        "query": "Joshua Herbert",
+        "operator": "AND"
+      }
+    }
+  }
+}
+
+# Indexing lots of documents using bulk API
+# Copy the contents of books-kibana-dataset.txt from book's repository(https://github.com/madhusudhankonda/elasticsearch-in-action/blob/main/datasets/books-kibana-dataset.txt)
+
+# Searching across multiple fields using multi_match query
+GET books/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "Java",
+      "fields": ["title","synopsis"]
+    }
+  }
+}
+# Boosting scores
+GET books/_search
+{
+  "query": {
+    "multi_match": { 
+      "query": "Java",
+      "fields": ["title^3","synopsis"]
+    }
+  }
+}
+
+#Fuzzy query (forgiving spelling mistakes)
+GET books/_search
+{
+  "query": {
+    "fuzzy": {
+      "title": {
+        "value": "kava",
+        "fuzziness": 1 
+      }
+    }
+  }
+}
+
+# Match Phrase query
+GET books/_search
+{
+  "query": {
+    "match_phrase": {
+      "synopsis": "must-have book for every Java programmer"
+    }
+  }
+}
+
+# Match Phrase query with highlights
+GET books/_search
+{
+  "query": {
+    "match_phrase": {
+      "synopsis": "must-have book for every Java programmer"
+    }
+  },
+  "highlight": {
+    "fields": {
+      "synopsis": {}
+    }
+  }
+}
+
+# Match Phrase query with a word missing - doesn't get results
+GET books/_search
+{
+  "query": {
+    "match_phrase": {
+      "synopsis": "must-have book every Java programmer"
+    }
+  }
+}
+
+# Match Phrase query with slop 1
+GET books/_search
+{
+  "query": {
+    "match_phrase": {
+      "synopsis": {
+      "query": "must-have book every Java programmer",
+      "slop": 1
+      }
+    }
+  }
+}
+
+#Add few adhoc documents to the books index to run match_phrase_prefix query
+PUT books/_doc/99
+{
+  "title":"Java Collections Deep Dive"
+}
+PUT books/_doc/100
+{
+  "title":"Java Computing World"
+}
+
+GET books/_search
+{
+  "query": {
+    "match_phrase_prefix": {
+      "title": "Java co"
+    }
+  }
+}
+
+## TERM queries
+# Get the index mapping
+GET books/_mapping
+
+# Getting third edition books using term query
+GET books/_search
+{
+ 
+  "query": {
+    "term": {
+      "edition": {
+        "value": 3
+      }
+    }
+  }
+}
+
+# Range query
+GET books/_search
+{
+  "query": {
+    "range": {
+      "amazon_rating": {
+        "gte": 4.5,
+        "lte": 5
+      }
+    }
+  }
+}
+
+## Bool queries
+# Must  clause with match query
+GET books/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "author": "Joshua Bloch"
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Must  clause with two leaf queries - match and match_phrase
+GET books/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "author": "Joshua Bloch"
+          }
+        },
+        {
+          "match_phrase": {
+            "synopsis": "best Java programming books"
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Must and must_not clauses
+GET books/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "author": "Joshua"
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "range": {
+            "amazon_rating": {
+              "lt": 4.7
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Must, must_not and should clauses
+GET books/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "author": "Joshua"
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "range": {
+            "amazon_rating": {
+              "lt": 4.7
+            }
+          }
+        }
+      ],
+      "should": [
+        {
+          "match": {
+            "tags": "Software"
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Should clause without a match - the query will not fail
+GET books/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "author": "Joshua"
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "range": {
+            "amazon_rating": {
+              "lt": 4.7
+            }
+          }
+        }
+      ],
+      "should": [
+        {
+          "match": {
+            "tags": "movies"
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Adding a filter clause - drops books older than 2015
+GET books/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "author": "Joshua"
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "range": {
+            "amazon_rating": {
+              "lt": 4.7
+            }
+          }
+        }
+      ],
+      "should": [
+        {
+          "match": {
+            "tags": "Software"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "release_date": {
+              "gte": "2015-01-01"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Adding a filter clause - drops books older than 2015
+GET books/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "author": "Joshua"
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "range": {
+            "amazon_rating": {
+              "lt": 4.7
+            }
+          }
+        }
+      ],
+      "should": [
+        {
+          "match": {
+            "tags": "Software"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "release_date": {
+              "gte": "2015-01-01"
+            }
+          }
+        },
+        {
+          "term": {
+            "edition": 3
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Adding a second filter (term query to check the edition )
+GET books/_search
+{
+  "query": {
+    "bool": {
+      "must": [{"match": {"author": "Joshua"}}],
+      "must_not":[{"range":{"amazon_rating":{"lt":4.7}}}],
+      "should": [{"match": {"tags": "Software"}}],
+      "filter":[
+        {"range":{"release_date":{"gte": "2015-01-01"}}},
+        {"term": {"edition": 3}}
+      ]}
+   }
+}
