@@ -10,3 +10,4 @@ Here's the TOC
 2. [Architecture](https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-3:-Architecture)
 4. [Mapping](https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-4.-Mapping)
 5. [Working with Documents](https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-5.-Document-Operations)
+6. [Appendix A: Installing and configuring Elasticsearch and Kibana](https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Appendix-A:-Installation)
