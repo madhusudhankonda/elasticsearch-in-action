@@ -547,3 +547,104 @@ GET books/_search
       ]}
    }
 }
+#Analytics
+## Average rating of books - Query DSL sample
+GET books/_search
+{
+  "aggs": {
+    "avg_rating": {
+      "avg": {
+        "field": "amazon_rating"
+      }
+    }
+  }
+}
+
+## Copy the contents of covid-26march2021.txt from datasets (https://github.com/madhusudhankonda/elasticsearch-in-action/blob/main/datasets/covid-26march2021.txt) to Kiban's DevTools. Once copied, execute them usign bulk API
+
+# Sum metric
+GET covid/_search
+{
+  "size": 0, 
+  "aggs": {
+    "critical_patients": {
+      "sum": {
+        "field": "critical"
+      }
+    }
+  }
+}
+
+# Max metric
+GET covid/_search
+{
+  "size": 0, 
+  "aggs": {
+    "total_deaths": {
+      "max": {
+        "field": "deaths"
+      }
+    }
+  }
+}
+
+#Stats metric
+GET covid/_search
+{
+  "size": 0, 
+  "aggs": {
+    "all_stats": {
+      "stats": {
+        "field": "deaths"
+      }
+    }
+  }
+}
+
+#Extended stats
+GET covid/_search
+{
+  "aggs": {
+    "all_extended_stats": {
+      "extended_stats": {
+        "field": "deaths"
+      }
+    }
+  }
+}
+
+#Bucketing aggreations
+
+## Histogram
+
+GET covid/_search
+{
+  "size": 0,
+  "aggs": {
+    "critical_patients_as_histogram": {
+      "histogram": {
+        "field": "critical",
+        "interval": 2500
+      }
+    }
+  }
+}
+
+#Range
+GET covid/_search
+{
+  "size": 0, 
+  "aggs": {
+    "range_countries": {
+      "range": {
+        "field": "deaths",
+        "ranges": [
+          {"to": 60000},
+          {"from": 60000,"to": 70000},
+          {"from": 70000,"to": 80000},
+          {"from": 80000,"to": 120000}
+        ]
+      }
+    }
+  }
+}
