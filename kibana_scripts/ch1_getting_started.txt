@@ -1,3 +1,9 @@
+## 
+## A handy file for hands-on exercises
+## Copy the whole contents of this file to Kibana's DevTools
+## Please let me know if you find any issues with the code
+##
+
 # Indexing a few documents into books index
 PUT books/_doc/1
 {
