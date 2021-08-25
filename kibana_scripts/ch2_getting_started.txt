@@ -213,16 +213,12 @@ GET books/_search
     }
   }
 }
-
-#Fuzzy query (forgiving spelling mistakes)
+# Phrase search
 GET books/_search
 {
   "query": {
-    "fuzzy": {
-      "title": {
-        "value": "kava",
-        "fuzziness": 1 
-      }
+    "match_phrase": {#A The match_phrase query expects a sequence of words
+      "synopsis": "must-have book for every Java programmer"#B Our phrase
     }
   }
 }
@@ -270,6 +266,19 @@ GET books/_search
       "synopsis": {
       "query": "must-have book every Java programmer",
       "slop": 1
+      }
+    }
+  }
+}
+
+#Fuzzy query (forgiving spelling mistakes)
+GET books/_search
+{
+  "query": {
+    "fuzzy": {
+      "title": {
+        "value": "kava",
+        "fuzziness": 1 
       }
     }
   }
@@ -565,7 +574,7 @@ GET books/_search
   }
 }
 
-## Copy the contents of covid-26march2021.txt from datasets (https://github.com/madhusudhankonda/elasticsearch-in-action/blob/main/datasets/covid-26march2021.txt) to Kiban's DevTools. Once copied, execute them usign bulk API
+## Copy the contents of covid-26march2021.txt from datasets (https://github.com/madhusudhankonda/elasticsearch-in-action/blob/main/datasets/covid-26march2021.txt) to Kibana's DevTools. Once copied, execute them using the _bulk API
 
 # Sum metric
 GET covid/_search
