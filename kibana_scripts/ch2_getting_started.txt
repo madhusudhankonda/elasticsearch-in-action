@@ -1,5 +1,5 @@
 ## 
-## A handy file for hands-on exercises
+## A handy scripts file for hands-on exercises on Kibana
 ## Copy the whole contents of this file to Kibana's DevTools
 ## Please let me know if you find any issues with the code
 ##
