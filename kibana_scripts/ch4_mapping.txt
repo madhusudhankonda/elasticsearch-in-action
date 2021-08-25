@@ -1,1 +1,6 @@
-# Ch4. Mapping Kibana script
+## 
+## A handy scripts file for hands-on exercises on Kibana
+## Copy the whole contents of this file to Kibana's DevTools
+## Please let me know if you find any issues with this script
+## If you wish to follow the running commentary for these scripts, follow the [Ch4 Mapping wiki page](https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-4.-Mapping) for this 
+
