@@ -1,8 +1,13 @@
 ## 
 ## A handy scripts file for hands-on exercises on Kibana
 ## Copy the whole contents of this file to Kibana's DevTools
-## Please let me know if you find any issues with the code
+
+## If you wish to follow the running commentary for these scripts, 
+## follow the Ch2 Getting Started wiki page here: https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-2:-Getting-Started
 ##
+## Please let me know if you find any issues with this script
+
+
 
 # Indexing a few documents into books index
 PUT books/_doc/1
