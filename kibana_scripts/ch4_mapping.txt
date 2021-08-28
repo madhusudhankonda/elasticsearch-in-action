@@ -7,4 +7,774 @@
 ##
 ## Please let me know if you find any issues with this script
 ##
+## Indexing a document for first time
 
+PUT movies/_doc/1
+{
+  "title":"Godfather",
+  "rating":4.9,
+  "release_year":"1972/08/01"
+}
+
+## Fixing the incorrect values
+### Adding age field with text values to the student document
+
+PUT students_temp/_doc/1 
+{
+  "name":"John",
+  "age":"12"
+}
+PUT students_temp/_doc/2 
+{
+  "name":"William",
+  "age":"14" 
+}
+
+# The sort query will result in error:
+GET students_temp/_search
+{
+  "sort": [ 
+    {
+      "age": {
+        "order": "asc"
+      }
+    }
+  ]
+}
+
+# The response indicates the operation is not allowed as the `age` has been defined as a text field.
+# To fix this, sort on `age.keyword` as the following query demonstrates:
+
+GET students_temp/_search
+{
+  "sort": [ 
+    {
+      "age.keyword": { 
+        "order": "asc" 
+      }
+    }
+  ]
+}
+
+## Update existing schema
+
+PUT employees/_mapping
+{
+  "properties":{
+    "joining_date":{ 
+      "type":"date",
+      "format":"dd-mm-yyyy"
+    },
+    "phone_number":{
+      "type":"keyword"
+    }
+  }
+}
+
+## Updating an empty index
+PUT departments/_mapping 
+{
+  "properties":{
+    "name":{
+      "type":"text"
+    }
+  }
+}
+## Reindexing
+POST _reindex
+{
+  "source": {"index": "orders"},
+  "dest": {"index": "orders_new"}
+}
+## Type coercion
+PUT cars/_doc/1
+{
+  "make":"BMW",
+  "model":"X3",
+  "age":"23"
+}
+### Using standard (default) analyser 
+POST _analyze
+{
+  "text": "The movie was sick!!! Hilarious :) :) and WITTY ;) a KiLLer 👍"
+}
+# The response is:`The movie was sick Hilarious and WITTY a KiLLer 👍`
+### Using English analyser 
+#We can change the analyser to any of the out-of-box analysers by setting a anlyzer field. We demonstrate this below for testing a text with an English analyzer:
+POST _analyze
+{
+  "text": "The movie was sick!!! Hilarious :) :) and WITTY ;) a KiLLer 👍",
+  "analyzer": "english"
+}
+
+#The response from the English analyser is: `movi,sick,hilari, witti, killer, 👍`
+#The stemmed words like `movi`, `hilari`, `witti` are not real words, but the incorrect spellings don’t matter as long as all the derived forms can match the stemmed words.
+## The token_count type
+PUT tech_books
+{
+  "mappings": {
+    "properties": {
+      "title": { 
+        "type": "token_count", 
+        "analyzer": "standard"
+      }
+    }
+  }
+}
+
+#Insert some adhoc docs:
+
+PUT tech_books/_doc/1
+{
+  "title":"Elasticsearch in Action"
+}
+
+PUT tech_books/_doc/2
+{
+  "title":"Elasticsearch for Java Developers"
+}
+
+PUT tech_books/_doc/3
+{
+  "title":"Elastic Stack in Action"
+}
+
+#Finally, let's put the token_count to use:
+
+GET tech_books/_search
+{
+  "query": {
+   "range": {
+     "title": {
+       "gt": 3,
+       "lte": 5
+     }
+   }
+  }
+}
+
+## Combining types
+## We can combine the title field as a text type as well as a token_type:
+```
+PUT tech_books
+{
+  "mappings": {
+    "properties": {
+      "title": {
+        "type": "text",
+        "fields": { 
+          "word_count": { 
+            "type": "token_count", 
+            "analyzer": "standard"
+          }
+        }
+      }
+    }
+  }
+}
+```
+# Now we can issue a query to fetch titles with word count more than 4:
+```
+GET tech_books/_search
+{
+  "query": {
+    "term": {
+     "title.word_count": {
+        "value": 4
+      }
+    }
+  }
+}
+```
+### The `keyword` type
+# Create an index with `email` as a keyword type:
+
+PUT faculty
+{
+  "mappings": {
+    "properties": {
+      "email": { 
+        "type": "keyword" 
+      }
+    }
+  }
+}
+
+### The `constant_keyword` data type
+# Census index with country declared as `constant_keyword` and UK as value
+
+PUT census 
+{
+  "mappings": {
+    "properties": {
+      "country":{
+        "type": "constant_keyword",
+        "value":"United Kingdom"
+      }
+    }
+  }
+}
+
+#Index a document for John Doe, with just his name (no `country` field):
+
+PUT census/_doc/1
+{
+  "name":"John Doe"
+}
+
+# When we search for all residents of the UK (though the document hasn’t got that field during indexing), we receive the positive result - returning John’s document:
+
+GET census/_search
+{
+  "query": {
+    "term": {
+      "country": {
+        "value": "United Kingdom"
+      }
+    }
+  }
+}
+
+#The `constant_keyword` field will have exactly the same value for every document in that index.
+
+### Wildcard type
+#The `wildcard` query to fetch documents matching to a value set as wildcard:
+
+GET errors/_search
+{
+  "query": {
+    "wildcard": {
+      "description": {
+        "value": "*obj*" 
+      }
+    }
+  }
+}
+
+## Date type
+#Creating an index with a date type
+
+PUT flights
+{
+  "mappings": {
+    "properties": {
+      "departure_date_time":{
+        "type": "date"
+      }
+    }
+  }
+}
+
+#We can customize the departure date in multiple formats too:
+
+#"departure_date_time":{ 
+#  "type": "date",
+#  "format": "dd-MM-yyyy||dd-MM-yy" 
+#}
+
+#Issue a range query fetching documents between two date/time slots:
+
+#"range": {
+#  "departure_date_time": {
+#    "gte": "2021-08-06T05:00:00",
+#    "lte": "2021-08-06T05:30:00"
+#    }
+#}
+
+## Boolean type
+
+PUT blockbusters
+{
+  "mappings": {
+    "properties": {
+       "blockbuster":{
+        "type": "boolean"
+      }
+    }
+  }
+}
+
+#Index couple of movies: Avatar as a blockbuster and Mulan(2020) as a flop, shown in the code snippet below:
+
+PUT blockbusters/_doc/2
+{
+  "title":"Avatar",
+  "blockbuster":true
+}
+
+PUT blockbusters/_doc/2
+{
+  "title":"Mulan",
+  "blockbuster":"false"
+}
+
+#The following query will fetch the Avatar as the blockbuster:
+
+GET blockbusters/_search
+{
+  "query": {
+    "term": {
+      "blockbuster": {
+        "value": "true"
+      }
+    }
+  }
+}
+
+#Note: you can also provide an empty string for a false value: "blockbuster":"".
+## The Range data types
+
+
+### The `date_range` type
+#Index a `trainings` index with `date_range` type field:
+
+PUT trainings
+{
+  "mappings": {
+    "properties": {
+      "name":{ 
+        "type": "text"
+      },
+      "training_dates":{ 
+        "type": "date_range"
+      }
+    }
+  }
+}
+
+#Let’s go ahead and index a few documents with Venkat’s training courses and dates. 
+
+PUT trainings/_doc/1 
+{
+  "name":"Functional Programming in Java",
+  "training_dates":{
+    "gte":"2021-08-07",
+    "lte":"2021-08-10"
+  }
+}
+PUT trainings/_doc/2
+{
+  "name":"Programming Kotlin",
+  "training_dates":{
+    "gte":"2021-08-09",
+    "lte":"2021-08-12"
+  }
+}
+
+PUT trainings/_doc/3
+{
+  "name":"Reactive Programming",
+  "training_dates":{
+    "gte":"2021-08-17",
+    "lte":"2021-08-20"
+  }
+}
+
+#The `data_range` type field expects two values: an upper bound and a lower bound. These are usually represented by abbreviations like gte (greater than or equal to), lt (less than), and so on. 
+
+#Issue a search request to find out Venkat’s courses between two dates:
+
+GET trainings/_search
+{
+  "query": {
+    "range": { 
+      "training_dates": {
+        "gt": "2021-08-10",
+        "lt": "2021-08-12"
+      }
+    }
+  }
+}
+
+#As a response to the query, we see Venkat is delivering _Programming Kotlin_ between these two dates (the second document matches for these dates). The data_range made it easy to search among a range of data.
+## IP Address data type
+# Develop an index with a field of `ip` data type:
+
+PUT networks
+{
+  "mappings": {
+    "properties": {
+      "router_ip":{ "type": "ip" } 
+    }
+  }
+}
+
+#Indexing the document is then straight forward:
+
+PUT networks/_doc/1
+{
+  "router_ip":"35.177.57.111" 
+}
+
+#Issue the following query searches to data in the `networks` index to get the matching IP address:
+
+GET networks/_search
+{
+  "query":{
+    "term": {
+      "router_ip": { "value": "35.177.0.0/16" }
+    }
+  }
+}
+
+# Advanced data types
+## Geo data type
+#Mapping schema for restaurants with address declared as `geo_point` type:
+
+PUT restaurants
+{
+  "mappings": {
+    "properties": {
+      "name":{
+        "type": "text"
+      },
+      "address":{
+        "type": "geo_point"
+      }
+    }
+  }
+}
+
+#Indexing a restaurant with an address represented by longitude and latitude
+
+PUT restaurants/_doc/1
+{
+  "name":"Sticky Fingers",
+  "address":{
+    "lon":"0.1278",
+    "lat":"51.5074"
+  }
+}
+
+#To search for a restaurant in a bounded area, we write the `geo_bounding_box` filter providing the address in the form of a rectangle with `top_let` and `bottom_right` coordinates given as latitude and longitude:
+
+GET restaurants/_search
+{
+  "query": {
+    "geo_bounding_box":{
+      "address":{
+        "top_left":{
+          "lon":"0",
+          "lat":"52"
+        },
+        "bottom_right":{
+          "lon":"1",
+          "lat":"50"
+        }
+      }
+    }
+  }
+}
+
+## Object data type
+#Define the schema definitions for `emails` model with object data types:
+
+
+PUT emails
+{
+  "mappings": {
+    "properties": {
+      "to":{
+        "type": "text"
+      },
+      "subject":{
+        "type": "text"
+      },
+      "attachments":{
+        "properties": {
+          "filename":{
+            "type":"text"
+          },
+          "filetype":{
+            "type":"text"
+          }
+        }
+      }
+    }
+  }
+}
+
+#Indexing an email document with all the relevant fields
+
+PUT emails/_doc/1
+{
+  "to:":"johndoe@johndoe.com",
+  "subject":"Testing Object Type",
+  "attachments":{
+    "filename":"file1.txt",
+    "filetype":"confidential"
+  }
+}
+
+#Searching for emails with a said attachment file:
+
+GET emails/_search
+{
+  "query": {
+    "term": {
+      "attachments.filename.keyword": "file1.txt"
+    }
+  }
+}
+
+### Limitations of an `object` type
+#Index a document with multiple attachments:
+
+PUT emails/_doc/2
+{
+  "to:":"mrs.doe@johndoe.com",
+  "subject":"Multi attachments test",
+  "attachments":[{
+    "filename":"file2.txt",
+    "filetype":"confidential"
+  },{
+    "filename":"file3.txt",
+    "filetype":"private"
+  }]
+}
+
+#Advanced bool query with term queries for a match with a filename and filetype
+
+GET myemails/_search 
+{
+  "query": {
+    "bool": {
+      "must": [ 
+        {"term": { "attachments.filename.keyword": "file2.txt"}},
+        {"term": { "attachments.filetype.keyword": "private" }}
+      ]
+    }
+  }
+}
+```
+## Nested data type
+#Mapping schema definition for nested type:
+
+PUT emails_nested
+{
+  "mappings": {
+    "properties": {
+      "attachments": {
+        "type": "nested",#A The attachments field is declared as nested type
+        "properties": {
+          "filename": {#B The field is declared as keyword to avoid tokenizing
+            "type": "keyword"
+          },
+          "filetype": {
+            "type": "text" #C We can leave this field as text
+          }
+        }
+      }
+    }
+  }
+}
+
+#Indexing a sample document into an `emails_nested` with nested property:
+
+PUT emails_nested/_doc/1
+{
+  "attachments" : [
+    {
+      "filename" : "file1.txt",
+      "filetype" :  "confidential"
+    },
+    {
+      "filename" : "file2.txt",
+      "filetype" :  "private"
+    }
+  ]
+}
+
+# Fetching the documents that match `file1.txt` with `private` as the classification:
+GET emails_nested/_search
+{
+  "query": {
+    "nested": { 
+      "path": "attachments",
+      "query": {
+        "bool": {
+          "must": [
+            { "match": { "attachments.filename": "file1.txt" }},
+            { "match": { "attachments.filetype":  "private" }} 
+          ]
+        }
+      }
+    }
+  }
+}
+
+## Flattened data type
+# Create a mapping with flattened data type:
+
+PUT consultations
+{
+  "mappings": {
+    "properties": {
+      "patient_name":{
+        "type": "text"
+      },
+      "doctor_notes":{
+        "type": "flattened"
+      }
+    }
+  }
+}
+
+# Indexing the consultation document with doctor’s notes:
+
+PUT consultations/_doc/1
+{
+  "patient_name":"John Doe",
+  "doctor_notes":{
+    "temperature":103,
+    "symptoms":["chills","fever","headache"],
+    "history":"none",
+    "medication":["Antibiotics","Paracetamol"]
+  }
+}
+
+# Searching through the flattened data type field
+
+GET consultations/_search
+{
+  "query": {
+    "match": {
+      "doctor_notes": "Paracetamol"
+    }
+  }
+}
+
+# An advanced query on a flattened data type:
+
+GET consultations/_search
+{
+  "query": {
+    "bool": {
+      "must": [{"match": {"doctor_notes": "headache"}},
+       {"match": {"doctor_notes": "Antibiotics"}}],
+      "must_not": [{"term": {"doctor_notes": {"value": "diabetics"}}}]
+    }
+  }
+}
+
+## Join data type
+# Mapping of the doctors schema definition
+
+PUT doctors
+{
+  "mappings": {
+    "properties": {
+      "relationship":{#A declare a property as join type
+        "type": "join",
+        "relations":{
+          "doctor":"patient" #B Names of the relations
+        }
+      }
+    }
+  }
+}
+
+# Indexing a doctor document - note the relationship attribute:
+
+PUT doctors/_doc/1
+{
+  "name":"Dr Mary Montgomery",
+  "relationship":{
+    "name":"doctor" 
+  }
+}
+
+# Creating two patients for our doctor:
+
+PUT doctors/_doc/2?routing=mary
+{
+  "name":"John Doe",
+  "relationship":{
+    "name":"patient",
+    "parent":1#D Patient’s patent (doctor) is document with ID 1
+  }
+}
+
+PUT doctors/_doc/3?routing=mary
+{
+  "name":"Mrs Doe",
+  "relationship":{
+    "name":"patient",
+    "parent":1
+  }
+}
+
+#Fetching the patients of Dr Montgomery
+
+GET doctors/_search
+{
+  "query": {
+    "parent_id":{
+      "type":"patient",
+      "id":1
+    }
+  }
+}
+
+#Mapping schema for technical books with the title as search_as_you_type type
+
+PUT tech_books
+{
+  "mappings": {
+    "properties": {
+      "title": {
+        "type": "search_as_you_type"#A The title supports typeahead feature
+        }
+      }
+    }
+  }
+}
+
+#Indexing a few books:
+
+PUT tech_books4/_doc/1
+{
+  "title":"Elasticsearch in Action"
+}
+
+PUT tech_books4/_doc/2
+{
+  "title":"Elasticsearch for Java Developers"
+}
+
+PUT tech_books4/_doc/3
+{
+  "title":"Elastic Stack in Action"
+}
+
+# Searching in a search_as_you_type field and its subfields
+
+GET tech_books4/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "in",
+      "type": "bool_prefix", 
+      "fields": ["title","title._2gram","title._3gram"]
+    }
+  }
+}
+
+# This query should return the Elasticsearch in Action and Elastic Stack in Action books.
+## Multi types
+#Schema definition with multi-typed field:
+
+PUT emails
+{
+  "mappings": {
+    "properties": {
+      "subject":{
+        "type": "text",
+        "fields": {
+          "kw":{ "type":"keyword" },
+          "comp":{ "type":"completion" }
+        }
+      }
+    }
+  }
+}
