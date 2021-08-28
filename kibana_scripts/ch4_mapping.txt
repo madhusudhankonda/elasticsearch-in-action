@@ -155,7 +155,7 @@ GET tech_books/_search
 
 ## Combining types
 ## We can combine the title field as a text type as well as a token_type:
-```
+
 PUT tech_books
 {
   "mappings": {
@@ -172,9 +172,9 @@ PUT tech_books
     }
   }
 }
-```
+
 # Now we can issue a query to fetch titles with word count more than 4:
-```
+
 GET tech_books/_search
 {
   "query": {
@@ -185,7 +185,7 @@ GET tech_books/_search
     }
   }
 }
-```
+
 ### The `keyword` type
 # Create an index with `email` as a keyword type:
 
@@ -321,7 +321,7 @@ GET blockbusters/_search
   }
 }
 
-#Note: you can also provide an empty string for a false value: "blockbuster":"".
+#Note: you can also provide an empty string for a false value: "blockbuster":""
 ## The Range data types
 
 
@@ -546,7 +546,7 @@ GET myemails/_search
     }
   }
 }
-```
+
 ## Nested data type
 #Mapping schema definition for nested type:
 
@@ -555,13 +555,13 @@ PUT emails_nested
   "mappings": {
     "properties": {
       "attachments": {
-        "type": "nested",#A The attachments field is declared as nested type
+        "type": "nested",
         "properties": {
-          "filename": {#B The field is declared as keyword to avoid tokenizing
+          "filename": {
             "type": "keyword"
           },
           "filetype": {
-            "type": "text" #C We can leave this field as text
+            "type": "text" 
           }
         }
       }
@@ -664,10 +664,10 @@ PUT doctors
 {
   "mappings": {
     "properties": {
-      "relationship":{#A declare a property as join type
+      "relationship":{
         "type": "join",
         "relations":{
-          "doctor":"patient" #B Names of the relations
+          "doctor":"patient" 
         }
       }
     }
@@ -691,7 +691,7 @@ PUT doctors/_doc/2?routing=mary
   "name":"John Doe",
   "relationship":{
     "name":"patient",
-    "parent":1#D Patient’s patent (doctor) is document with ID 1
+    "parent":1
   }
 }
 
@@ -723,12 +723,12 @@ PUT tech_books
   "mappings": {
     "properties": {
       "title": {
-        "type": "search_as_you_type"#A The title supports typeahead feature
-        }
+        "type": "search_as_you_type"
       }
     }
   }
 }
+
 
 #Indexing a few books:
 
