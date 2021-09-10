@@ -1,1 +1,163 @@
-# Ch6: Indexing Operations
+## 
+## A handy scripts file for hands-on exercises on Kibana
+## Copy the whole contents of this file to Kibana's DevTools
+
+## If you wish to follow the running commentary for these scripts, 
+## follow the Ch6 Text Analysis wiki page here: https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-5.-Text Analysis
+##
+## Please let me know if you find any issues with this script
+##
+
+PUT _cluster/settings
+{
+  "persistent": {
+    "action.auto_create_index":false
+  }
+}
+
+PUT cars/_doc/1 
+{
+  "make":"Maserati",
+  "model":"GranTurismo Sport",
+  "speed_mph":186
+}
+
+GET cars
+
+#The action will set a flag such that only indices which match the *temp* pattern will be automatically gets created.
+PUT _cluster/settings
+{
+  "persistent": {
+    "action.auto_create_index":"*temp*"
+  }
+}
+
+# For example, this indexing operation will fail
+PUT my_non_existing_index/_doc/1 
+{
+  "make":"Maserati",
+  "model":"GranTurismo Sport",
+  "speed_mph":186
+}
+
+
+PUT _cluster/settings
+{
+  "persistent": {
+    "action.auto_create_index": ".admin*, cars*, *books*, -x*,-y*,+z*"
+  }
+}
+
+PUT flights/_doc/1
+{
+  "carrier":"BA"
+}
+
+# Index with settings
+PUT cars_with_custom_settings
+{
+  "settings":{
+    "number_of_shards":3,
+    "number_of_replicas":5
+  }
+}
+# Index with mappings
+PUT car_with_mappings
+{
+  "mappings": {
+    "properties": { 
+      "make":{
+        "type": "text"
+      },
+      "model":{
+        "type": "text"
+      },
+      "registration_year":{
+        "type": "date",
+        "format": "dd-MM-yyyy"
+      }
+    }
+  }
+}
+
+# Index with settings and mappings
+PUT car_with_settings_and_mappings
+{
+  "settings": {
+    "number_of_replicas": 3
+  }, 
+  "mappings": {
+    "properties": { 
+      "make":{
+        "type": "text"
+      },
+      "model":{
+        "type": "text"
+      },
+      "registration_year":{
+        "type": "date",
+        "format": "dd-MM-yyyy"
+      }
+    }
+  }
+}
+
+# Creating an alias for cars index
+PUT cars/_alias/my_cars_alias
+
+# Creating an alias for multiple indices
+PUT cars1
+PUT cars2
+PUT cars3
+
+PUT cars1,cars2,cars3/_alias/multi_cars_alias
+
+#Creating an alias for indices identified by wildcard
+PUT cars*/_alias/wildcard_cars_alias
+
+PUT cars
+{
+  "aliases": {
+    "my_new_cars_alias": {}
+  }
+}
+
+PUT .my_hidden_index
+
+PUT .old_cars
+GET *cars*
+GET _all
+GET *
+
+GET _all
+
+PUT carr/_alias/carr_alias
+
+DELETE carr/_alias/carr_alias
+
+# Closing the cars index until indefinitely
+POST cars/_close?wait_for_active_shards=index-setting
+
+# Closing down multiple indices in a go
+POST cars1,*mov*,students*/_close?wait_for_active_shards=index-setting
+
+# Halting all the live operations on our indices in a cluster
+POST */_close?wait_for_active_shards=index-setting
+
+# Disabling the action to close ALL indices
+PUT _cluster/settings
+{
+  "persistent": {
+    "action.destructive_requires_name":true
+  }
+}
+
+# Disabling the close action completely (default is true)
+PUT _cluster/settings
+{
+  "persistent": {
+    "cluster.indices.close.enable":false
+  }
+}
+# Open all the indices (make sure the action.destructive_requires_name is true if you wish to invoke this call)
+POST */_open
