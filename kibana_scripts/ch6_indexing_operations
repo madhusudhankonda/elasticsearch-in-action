@@ -3,7 +3,7 @@
 ## Copy the whole contents of this file to Kibana's DevTools
 
 ## If you wish to follow the running commentary for these scripts, 
-## follow the Ch6 Text Analysis wiki page here: https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-5.-Text Analysis
+## follow the Ch6 Text Analysis wiki page here: https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-6.-Indexing Operations
 ##
 ## Please let me know if you find any issues with this script
 ##
@@ -53,14 +53,28 @@ PUT flights/_doc/1
   "carrier":"BA"
 }
 
-# Index with settings
+# Index with custom settings
 PUT cars_with_custom_settings
 {
   "settings":{
     "number_of_shards":3,
-    "number_of_replicas":5
+    "number_of_replicas":5,
+    "codec": "best_compression", 
+    "max_script_fields":128,
+    "refresh_interval": "60s"
   }
 }
+
+# Fetch settings for an index
+GET cars_with_custom_settings/_settings
+
+# Fetch settings for all indices starting with cars
+GET cars*/_settings
+
+# Fetch settings for all indices starting with cars
+GET cars_with_custom_settings/_settings/index.number_of_shards
+
+
 # Index with mappings
 PUT car_with_mappings
 {
@@ -105,12 +119,36 @@ PUT car_with_settings_and_mappings
 # Creating an alias for cars index
 PUT cars/_alias/my_cars_alias
 
+# We can use the same alias for indexing documents
+PUT my_cars_alias/_doc/1
+{
+  "make":"BMW"
+}
+
+GET cars/_doc/1
+
+# We can also use the alias for searching queries:
+GET my_cars_alias/_search
+{
+  "query": {
+    "match": {
+      "make": "BMW"
+    }
+  }
+}
 # Creating an alias for multiple indices
 PUT cars1
 PUT cars2
 PUT cars3
 
 PUT cars1,cars2,cars3/_alias/multi_cars_alias
+
+# Writing to this multi-alias will throw an error ("no write index is defined for alias [multi_cars_alias]")
+PUT multi_cars_alias/_doc/1
+{
+  "title":"Sample"
+}
+
 
 #Creating an alias for indices identified by wildcard
 PUT cars*/_alias/wildcard_cars_alias
@@ -121,6 +159,49 @@ PUT cars
     "my_new_cars_alias": {}
   }
 }
+# Fetching alias information
+GET my_cars_alias/_alias
+GET all_cars_alias,my_cars_alias/_alias
+
+PUT vintage_cars
+PUT vintage_cars_new
+# Multiple aliasing actions using _aliases API
+POST _aliases
+{
+  "actions": [
+    {
+      "remove": {
+        "index": "vintage_cars",
+        "alias": "vintage_cars_alias"
+      }
+    },
+    {
+      "add": { 
+        "index": "vintage_cars_new",
+        "alias": "vintage_cars_alias"
+      }
+    }
+  ]  
+}
+
+PUT power_cars
+PUT rare_cars
+PUT luxury_cars
+
+
+# Creating an alias pointing to multiple indices using _aliases API
+POST _aliases
+{
+  "actions": [
+    {
+      "add": {
+        "indices": ["vintage_cars","power_cars","rare_cars","luxury_cars"],
+        "alias": "high_end_cars"
+      }
+    }
+  ]
+}
+
 
 PUT .my_hidden_index
 
@@ -129,7 +210,11 @@ GET *cars*
 GET _all
 GET *
 
+#Get all indices
 GET _all
+
+HEAD carsxxx
+
 
 PUT carr/_alias/carr_alias
 
@@ -161,3 +246,130 @@ PUT _cluster/settings
 }
 # Open all the indices (make sure the action.destructive_requires_name is true if you wish to invoke this call)
 POST */_open
+
+## Templates
+DELETE _index_template/cars_template
+PUT _index_template/cars_template
+{
+  "index_patterns": [
+    "*cars*"
+  ],
+  "template": {
+    "settings": {
+      "number_of_shards": 3,
+      "number_of_replicas": 5
+    },
+    "mappings": {
+      "properties": {
+        "make": {
+          "type": "text",
+          "fields": {
+            "make_completion": {
+              "type": "completion"
+            }
+          }
+        }
+      }
+    },
+    "aliases":{
+      "my_cars_alias":{}
+    }
+  }
+}
+
+POST _component_template/dev_settings_component_template
+{
+  "template":{
+    "settings":{
+      "number_of_shards":3,
+      "number_of_replicas":3
+    }
+  }
+}
+
+POST _component_template/dev_mapping_component_template
+{
+  "template": {
+    "mappings": {
+      "properties": {
+        "created_by": {
+          "type": "text"
+        },
+        "version": {
+          "type": "float"
+        }
+      }
+    }
+  }
+}
+
+# STATUS Monitoring
+
+GET cars/_doc/1
+
+GET cars/_stats
+
+# Stats for mulitple indices
+GET cars1,cars2/_stats
+
+# Stats for ALL indices
+GET _stats
+
+# Stats for mulitple indices
+GET cars/_stats/merge
+
+# Fetching individual stats
+GET cars/_stats/segments
+
+# Get more info on segments
+GET cars/_segments
+
+# Fetching the segments across the whole cluster
+GET _segments
+
+
+## Splitting indices
+
+#Create an index (this is the overloaded index)
+PUT all_cars
+{
+  "settings": {
+    "number_of_shards": 3
+  }
+}
+# Make it read-only
+PUT all_cars/_settings
+{
+  "settings":{
+    "index.blocks.write":"true"
+  }
+}
+
+# Split it
+POST all_cars/_split/all_cars_new
+{
+  "settings": {
+    "index.number_of_shards": 12
+  }
+}
+
+# Splitting this way will thrown an error as the target shards are not a multiple of source index shard number
+POST all_cars/_split/all_cars_new2
+{
+  "settings": {
+    "index.number_of_shards": 14
+  }
+}
+
+#Shrinking the index
+
+
+
+
+
+
+
+
+
+
+
