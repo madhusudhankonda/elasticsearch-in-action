@@ -7,3 +7,12 @@
 ##
 ## Please let me know if you find any issues with this script
 
+## Indexing Documents
+
+### Indexing a movie document with an identifier:
+
+PUT movies/_doc/1
+{
+  "title":"The Godfather",
+  "synopsis":"The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son"
+}
