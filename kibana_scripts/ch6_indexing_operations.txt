@@ -8,19 +8,22 @@
 ## Please let me know if you find any issues with this script
 ##
 
-PUT _cluster/settings
-{
-  "persistent": {
-    "action.auto_create_index":false
-  }
-}
-
-PUT cars/_doc/1 
+# First document containing car data
+PUT cars/_doc/1
 {
   "make":"Maserati",
   "model":"GranTurismo Sport",
   "speed_mph":186
 }
+
+# Disabling automatic creation of indices
+PUT _cluster/settings
+{
+  "persistent": {   
+    "action.auto_create_index":false 
+  }
+}
+
 
 GET cars
 
