@@ -16,3 +16,320 @@ PUT movies/_doc/1
   "title":"The Godfather",
   "synopsis":"The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son"
 }
+
+## Posting a movie review without an ID
+POST movies_reviews/_doc
+{
+  "movie":"The Godfather",
+  "user":"Peter Piper",
+  "rating":4.5,
+  "remarks":"The movie started with a ..."
+}
+
+
+## Updating documents
+
+### Adding new fields
+POST movies/_update/1
+{
+  "doc": {
+    "actors":["Marldon Brando","Al Pacino","James Cann"],
+    "director":"Frances Ford Coppola"  
+  }
+}
+
+### Modify an existing document
+POST movies/_update/1
+{
+  "doc": {
+    "title":"The Godfather (Original)"
+  }
+}
+
+GET movies/_doc/1
+
+### Adding a new value to the actors array
+POST movies/_update/1
+{
+  "doc": {
+    "actors":["Marldon Brando","Al Pacino","James Cann", "Robert Duvall"]
+  }
+}
+
+## Scripted updates
+### Adding additional actor via the script
+POST movies/_update/1
+{
+  "script": {
+    "source": "ctx._source.actors.add('Diane Keaton')"
+  }
+}
+
+GET movies/_doc/1
+
+## Removing an actor using the script
+POST movies/_update/1
+{
+  "script": {
+    "source": "ctx._source.actors.remove(ctx._source.actors.indexOf('Diane Keaton'))"
+  }
+}
+
+### Adding a new field
+POST movies/_update/1
+{
+  "script": {
+    "source": "ctx._source.imdb_user_rating = 9.2"
+  }
+}
+
+### Removing a field
+POST movies/_update/1
+{
+  "script": {
+    "source": "ctx._source.remove('metacritic_rating')"
+  }
+}
+
+### Adding multiple fields
+POST movies/_update/1
+{
+  "script": {
+    "source": """
+    ctx._source.runtime_in_minutes = 175;
+    ctx._source.metacritic_rating= 100;
+    ctx._source.tomatometer = 97;
+    ctx._source.boxoffice_gross_in_millions = 134.8;
+    """
+  }
+}
+
+### Conditional updates
+POST movies/_update/1
+{
+  "script": {
+    "source": """
+    if(ctx._source.boxoffice_gross_in_millions > 125) 
+      {ctx._source.blockbuster = true} 
+     else 
+      {ctx._source.blockbuster = false}
+    """
+  }
+}
+
+### Retrieve the document
+GET movies/_doc/1
+
+### Dynamically passing a parameter to the script
+POST movies/_update/1
+{
+  "script": {
+    "source": """
+ if(ctx._source.boxoffice_gross_in_millions > params.gross_earnings_threshold) 
+   {ctx._source.blockbuster = true} 
+ else 
+   {ctx._source.blockbuster = false}
+ """,
+    "params": {
+      "gross_earnings_threshold":150
+    }
+  }
+}
+
+### Upsert
+POST movies/_update/5
+{
+  "script": {
+    "source": "ctx._source.gross_earnings = '357.1m'"
+  },
+  "upsert": {
+    "title":"Top Gun",
+    "gross_earnings":"357.5m"
+  }
+}
+
+## Updating a non-existing field will throw an error
+POST movies/_update/11
+{
+  "doc": {
+    "runtime_in_minutes":110  
+  }
+}
+
+## Updating a non-existing field that throws an error fixed with doc_as_upsert flag
+POST movies/_update/11
+{
+  "doc": {
+    "runtime_in_minutes":110  
+  },
+  "doc_as_upsert":true
+}
+
+### Updating the document using a query method
+POST movies/_update_by_query
+{
+  "query": {
+    "match": {
+      "actors": "Al Pacino"
+    }
+  },
+  
+  "script": {
+    "source": """
+    ctx._source.actors.add('Oscar Winner Al Pacino');
+    ctx._source.actors.remove(ctx._source.actors.indexOf('Al Pacino'))
+    """,
+    "lang": "painless"
+  }
+}
+
+## Deleting documents
+
+### Deleting a document given an ID
+DELETE movies/_doc/1
+
+## Delete by query
+### Add three sample documents
+PUT movies/_doc/101
+{
+  "title":"Jaws",
+  "director":"Steven Spielberg",
+  "gross_earnings_in_millions":355
+}
+
+PUT movies/_doc/102
+{
+  "title":"Jaws II",
+  "director":"Steven Spielberg",
+  "gross_earnings_in_millions":375
+}
+
+PUT movies/_doc/103
+{
+  "title":"Jaws III",
+  "director":"Steven Spielberg",
+  "gross_earnings_in_millions":300
+}
+
+# Delete the movies by a range query
+POST movies/_delete_by_query
+{
+  "query": {
+    "range": {
+      "gross_earnings_in_millions": {
+        "gt": 350,
+        "lt": 400
+      }
+    }
+  }
+}
+
+#Not found
+GET movies/_doc/101
+
+#Not found
+GET movies/_doc/102
+
+#Found the movie
+GET movies/_doc/103
+
+
+## Complex delete query
+POST movies/_delete_by_query
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "director": "Steven Spielberg"
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "range": {
+            "imdb_rating": {
+              "gte": 9,
+              "lte": 9.5
+            }
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "gross_earnings_in_millions": {
+              "lt": 100
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+## Bulk indexing
+
+POST _bulk
+{"index":{"_index":"movies","_id":"100"}} 
+{"title": "Mission Impossible","release_date": "1996-07-05"}
+
+
+POST movies/_bulk
+{"index":{"_id":"100"}} 
+{"title": "Mission Impossible","release_date": "1996-07-05"}
+
+## Tom Cruise's movies
+POST movies/_bulk
+{"index":{}} 
+{"title": "Mission Impossible","release_date": "1996-07-05"}
+{"index":{}} 
+{"title": "Mission Impossible II","release_date": "2000-05-24"}
+{"index":{}} 
+{"title": "Mission Impossible III","release_date": "2006-05-03"}
+{"index":{}} 
+{"title": "Mission Impossible - Ghost Protocol","release_date": "2011-12-26"}
+
+## Multiple entities
+
+POST _bulk
+{"index":{"_index":"books"}} 
+{"title": "Elasticsearch in Action"}
+{"create":{"_index":"flights", "_id":"101"}} 
+{"title": "London to Bucharest"}
+{"index":{"_index":"pets"}} 
+{"name": "Milly","age_months": 18}
+{"delete":{"_index":"movies", "_id":"101"}} 
+{ "update" : {"_index":"movies", "_id":"1"} }
+{ "doc" : {"title" : "The Godfather (Original)"} }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
