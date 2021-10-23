@@ -8,8 +8,11 @@
 ## Please let me know if you find any issues with this script
 ##
 
+## Indexing Documents
+
+### Indexing a movie document with an identifier:
 # First document containing car data
-PUT cars/_doc/1
+PUT cars/_doc/1 
 {
   "make":"Maserati",
   "model":"GranTurismo Sport",
@@ -17,159 +20,153 @@ PUT cars/_doc/1
 }
 
 # Disabling automatic creation of indices
-PUT _cluster/settings
+# Don't execute it for now as it will hamper your progress
+# executing the rest of the script 
+# PUT _cluster/settings  
+# {
+#  "persistent": {   
+#    "action.auto_create_index":false 
+#  }
+# }
+
+# Index with sample mapping
+PUT cars_index_with_sample_mapping
 {
-  "persistent": {   
-    "action.auto_create_index":false 
+  "mappings": {
+    "properties": {
+      "make":{
+        "type": "text"
+      }
+    }
   }
 }
 
-
-GET cars
-
-#The action will set a flag such that only indices which match the *temp* pattern will be automatically gets created.
-PUT _cluster/settings
+#Index with custom settings      
+PUT cars_index_with_sample_settings 
 {
-  "persistent": {
-    "action.auto_create_index":"*temp*"
+  "settings": {     
+    "number_of_replicas": 3,
+    "codec": "best_compression"
   }
 }
 
-# For example, this indexing operation will fail
-PUT my_non_existing_index/_doc/1 
+# Creating an index with an alias   
+PUT cars_index_with_sample_alias 
 {
-  "make":"Maserati",
-  "model":"GranTurismo Sport",
-  "speed_mph":186
-}
-
-
-PUT _cluster/settings
-{
-  "persistent": {
-    "action.auto_create_index": ".admin*, cars*, *books*, -x*,-y*,+z*"
+  "aliases": {  
+    "alias_for_cars_index_with_sample_alias": {} 
   }
 }
-
-PUT flights/_doc/1
+ 
+# Creating an index with custom settings
+PUT cars_with_custom_settings 
 {
-  "carrier":"BA"
-}
-
-# Index with custom settings
-PUT cars_with_custom_settings
-{
-  "settings":{
-    "number_of_shards":3,
-    "number_of_replicas":5,
-    "codec": "best_compression", 
+  "settings":{ 
+    "number_of_shards":3, 
+    "number_of_replicas":5,  
+    "codec": "best_compression",
     "max_script_fields":128,
     "refresh_interval": "60s"
   }
 }
 
-# Fetch settings for an index
+# Updating dynamic property on an index 
+PUT cars_with_custom_settings/_settings
+{
+  "settings": {
+    "number_of_replicas": 2
+  }
+}
+
+
+# Fetching the settings of an index
 GET cars_with_custom_settings/_settings
 
-# Fetch settings for all indices starting with cars
-GET cars*/_settings
+# Pre-requisite to create three car indices for the next query to pass
+PUT cars1
+PUT cars2
+PUT cars3
 
-# Fetch settings for all indices starting with cars
+# Fetching the settings of multiple indices in one go
+GET cars1,cars2,cars3/_settings 
+
+# Fetches the settings for the index identified with a wildcard (*)
+GET cars*/_settings  
+
+# Fetching a single attribute
 GET cars_with_custom_settings/_settings/index.number_of_shards
 
-
-# Index with mappings
-PUT car_with_mappings
+#Creating an index with field mappings for a car document
+PUT cars_with_mappings
 {
-  "mappings": {
-    "properties": { 
+  "mappings": {  
+    "properties": {  
       "make":{
-        "type": "text"
+        "type": "text" 
       },
       "model":{
         "type": "text"
       },
-      "registration_year":{
+      "registration_year":{ 
         "type": "date",
-        "format": "dd-MM-yyyy"
+        "format": "dd-MM-yyyy"  
       }
     }
   }
 }
 
-# Index with settings and mappings
-PUT car_with_settings_and_mappings
+#Creating an index with both settings and mappings
+PUT cars_with_settings_and_mappings 
 {
-  "settings": {
+  "settings": { 
     "number_of_replicas": 3
   }, 
   "mappings": {
     "properties": { 
       "make":{
-        "type": "text"
-      },
-      "model":{
-        "type": "text"
-      },
-      "registration_year":{
-        "type": "date",
-        "format": "dd-MM-yyyy"
+        "type": "text" 
       }
     }
   }
 }
 
-# Creating an alias for cars index
-PUT cars/_alias/my_cars_alias
-
-# We can use the same alias for indexing documents
-PUT my_cars_alias/_doc/1
-{
-  "make":"BMW"
-}
-
-GET cars/_doc/1
-
-# We can also use the alias for searching queries:
-GET my_cars_alias/_search
-{
-  "query": {
-    "match": {
-      "make": "BMW"
-    }
-  }
-}
-# Creating an alias for multiple indices
-PUT cars1
-PUT cars2
-PUT cars3
-
-PUT cars1,cars2,cars3/_alias/multi_cars_alias
-
-# Writing to this multi-alias will throw an error ("no write index is defined for alias [multi_cars_alias]")
-PUT multi_cars_alias/_doc/1
-{
-  "title":"Sample"
-}
-
-
-#Creating an alias for indices identified by wildcard
-PUT cars*/_alias/wildcard_cars_alias
-
-PUT cars
+# Creating an alias using an aliases object 
+PUT cars_for_aliases 
 {
   "aliases": {
     "my_new_cars_alias": {}
   }
 }
-# Fetching alias information
+
+# Creating an alias using an _alias endpoint
+PUT cars_for_aliases/_alias/my_cars_alias
+
+# Creating an alias using an _alias endpoint
+PUT cars_for_aliases/_alias/all_cars_alias
+
+# Creating a single alias pointing to multiple indices
+PUT cars1,cars2,cars3/_alias/multi_cars_alias             
+
+
+# Creating an alias with a wildcard
+PUT cars*/_alias/wildcard_cars_alias 
+
+#Fetching aliases, settings, and mappings for an index
+GET cars
+
+# Getting an alias on a single index
 GET my_cars_alias/_alias
+
+
+# Fetching aliases associated with multiple indices
 GET all_cars_alias,my_cars_alias/_alias
 
+#Prerequisite in getting the next query executed successfully
 PUT vintage_cars
 PUT vintage_cars_new
-# Multiple aliasing actions using _aliases API
-POST _aliases
+
+# Performing multiple aliasing operations   
+POST _aliases 
 {
   "actions": [
     {
@@ -187,52 +184,61 @@ POST _aliases
   ]  
 }
 
+# Prerequiste for the next query
 PUT power_cars
 PUT rare_cars
 PUT luxury_cars
 
-
-# Creating an alias pointing to multiple indices using _aliases API
+# Creating an alias pointing to multiple indice
 POST _aliases
 {
   "actions": [
     {
       "add": {
         "indices": ["vintage_cars","power_cars","rare_cars","luxury_cars"],
-        "alias": "high_end_cars"
+        "alias": "high_end_cars_alais"
       }
     }
   ]
 }
 
 
-PUT .my_hidden_index
+# Getting index configurations for multiple indices
+GET cars1,cars2,cars3  
 
-PUT .old_cars
-GET *cars*
-GET _all
-GET *
+# Getting multiple index configurations with a wildcard
+GET ca*  
 
-#Get all indices
-GET _all
-
-HEAD carsxxx
+# Fetching configurations for specific indices
+GET mov*,stu*
 
 
-PUT carr/_alias/carr_alias
 
-DELETE carr/_alias/carr_alias
+# Getting individual configurations for an index
+GET cars/_settings  
+GET cars/_mapping  
+GET cars/_alias    
 
-# Closing the cars index until indefinitely
+#Prerequisite for the next query
+PUT cars/_alias/cars_alias
+
+#Deleting an alias explicitly
+DELETE cars/_alias/cars_alias  
+
+# Closing the cars index indefinitely   
 POST cars/_close?wait_for_active_shards=index-setting
 
-# Closing down multiple indices in a go
+# Closing multiple indices
 POST cars1,*mov*,students*/_close?wait_for_active_shards=index-setting
 
-# Halting all the live operations on our indices in a cluster
-POST */_close?wait_for_active_shards=index-setting
+#Halt all the live operations using _all or *:
+# I am commenting this out - uncomment only when you know what you are doing. 
+# Refer to Book for more informtion
 
-# Disabling the action to close ALL indices
+# POST */_close?wait_for_active_shards=index-setting
+
+# Disabling the action to close all indices
+# Caution: Make sure you understand the implication of this command. Refer to book notes
 PUT _cluster/settings
 {
   "persistent": {
@@ -240,46 +246,61 @@ PUT _cluster/settings
   }
 }
 
-# Disabling the close action completely (default is true)
+# Disabling the closing indices feature
+# Caution: Make sure you understand the implication of this command. Refer to book notes
 PUT _cluster/settings
 {
   "persistent": {
     "cluster.indices.close.enable":false
   }
 }
-# Open all the indices (make sure the action.destructive_requires_name is true if you wish to invoke this call)
-POST */_open
 
-## Templates
-DELETE _index_template/cars_template
-PUT _index_template/cars_template
+
+
+# Putting the index back into operation
+POST cars/_open
+
+
+# Creating an index template
+POST _index_template/cars_template
 {
-  "index_patterns": [
-    "*cars*"
-  ],
+  "index_patterns": ["*cars*"],
+  "priority": 1, 
   "template": {
-    "settings": {
-      "number_of_shards": 3,
-      "number_of_replicas": 5
-    },
     "mappings": {
-      "properties": {
-        "make": {
-          "type": "text",
-          "fields": {
-            "make_completion": {
-              "type": "completion"
-            }
-          }
+      "properties":{
+        "created_at":{
+          "type":"date"
+        },
+        "created_by":{
+          "type":"text"
         }
       }
-    },
-    "aliases":{
-      "my_cars_alias":{}
     }
   }
 }
 
+
+
+# the cars_template_mar21 overrides the cars_template_feb21 in the following code snippet (though the names suggest the other way!):
+#POST _index_template/cars_template_mar21
+#{
+#  "index_patterns": ["*cars*"],
+#  "priority": 20, 
+#  "template": { ... }
+#}
+
+#POST _index_template/cars_template_feb21
+#{
+#  "index_patterns": ["*cars*"],
+#  "priority": 30, 
+#   "template": { ... }
+#}
+#A The lower priority index template
+#B Same matching template but with a higher priority
+
+
+# Developing a component template 
 POST _component_template/dev_settings_component_template
 {
   "template":{
@@ -290,6 +311,8 @@ POST _component_template/dev_settings_component_template
   }
 }
 
+
+# A component template with a mapping schema
 POST _component_template/dev_mapping_component_template
 {
   "template": {
@@ -306,65 +329,221 @@ POST _component_template/dev_mapping_component_template
   }
 }
 
-# STATUS Monitoring
 
-GET cars/_doc/1
 
+# Creating an index template composed of a component template
+POST _index_template/composed_cars_template
+{
+  "index_patterns": ["*cars*"], 
+  "priority": 200, 
+  "composed_of": ["dev_settings_component_template",
+  "dev_mapping_component_template"]
+}
+
+
+# Fetching the statistics of an index
 GET cars/_stats
 
-# Stats for mulitple indices
-GET cars1,cars2/_stats
+# Fetching the statistics for multiple indices
+GET cars*/_stats
 
-# Stats for ALL indices
-GET _stats
+# Fetching the statistics for all indices in the cluster
+GET */_stats
 
-# Stats for mulitple indices
-GET cars/_stats/merge
-
-# Fetching individual stats
+#The following snippet shows how to return the statistics in segments:
 GET cars/_stats/segments
 
-# Get more info on segments
-GET cars/_segments
 
-# Fetching the segments across the whole cluster
-GET _segments
-
-
-## Splitting indices
-
-#Create an index (this is the overloaded index)
+# Prerequisite for the next query
 PUT all_cars
-{
-  "settings": {
-    "number_of_shards": 3
-  }
-}
-# Make it read-only
-PUT all_cars/_settings
+
+# Making sure the index is read-only
+PUT all_cars/_settings 
 {
   "settings":{
-    "index.blocks.write":"true"
+    "index.blocks.write":"true" 
   }
 }
 
-# Split it
-POST all_cars/_split/all_cars_new
+#Splitting the all_cars index
+# Note the target index’s primary shard number must be a multiple of the number of primary shards of the source index. Refer to book for more details.
+
+POST all_cars/_split/all_cars_new  
 {
   "settings": {
-    "index.number_of_shards": 12
+    "index.number_of_shards": 12 
   }
 }
 
-# Splitting this way will thrown an error as the target shards are not a multiple of source index shard number
-POST all_cars/_split/all_cars_new2
+# This query will throw an exception. That’s because we violated the second rule (see book notes):
+# "reason" : "the number of source shards [3] must be a factor of [14]"
+
+POST all_cars/_split/all_cars_new            
 {
   "settings": {
     "index.number_of_shards": 14
   }
 }
 
-#Shrinking the index
+
+#Carrying out the prerequisites before shrinking the index
+PUT all_cars/_settings
+{
+  "settings": {
+    "index.blocks.write": true,
+    "index.routing.allocation.require._name": "node1"
+  }
+}
+
+
+
+# Shrinking the index                   
+PUT all_cars/_shrink/all_cars_new2  
+{
+  "settings":{
+    "index.blocks.write":null,
+    "index.routing.allocation.require._name":null,
+    "index.number_of_shards":1,
+    "index.number_of_replicas":5
+  }
+}
+
+#Prerequisite for the next query
+PUT cars_2021-000001
+
+# Creating an alias for an existing index 
+POST _aliases 
+{
+  "actions": [ 
+    {
+      "add": { 
+        "index": "cars_2021-000001", 
+        "alias": "latest_cars_a",
+        "is_write_index": true 
+      }
+    }
+  ]
+}
+
+# Rolling over the index             
+POST latest_cars_a/_rollover
+
+# The response from the above rollover call:
+#{
+#  "acknowledged" : true,
+#  "shards_acknowledged" : true,
+#  "old_index" : "latest_cars-000001", #A Old index name
+#  "new_index" : "latest_cars-000002", #B New index name
+#  "rolled_over" : true,
+#  "dry_run" : false,
+#  "conditions" : { }
+#}
+
+# Creating a policy with hot and delete policies
+PUT _ilm/policy/hot_delete_policy 
+{
+  "policy": { 
+    "phases": {
+      "hot": { 
+        "min_age": "1d", 
+        "actions": {    
+          "set_priority": {  
+            "priority": 250
+          }
+        }
+      }, 
+      "delete": {  
+        "actions": {
+          "delete" : { }
+        }
+      }
+    }
+  }
+}
+
+# Creating an index with an index life cycle
+PUT hot_delete_policy_index
+{
+  "settings": { 
+    "index.lifecycle.name":"hot_delete_policy" 
+  }
+}
+
+#Simple policy definition for hot phase
+PUT _ilm/policy/hot_simple_policy
+{
+  "policy": {
+    "phases": {
+      "hot": {    
+        "min_age": "0ms", 
+        "actions": {
+          "rollover": {   
+            "max_age": "1d",
+            "max_docs": 10000,
+            "max_size": "10gb"
+          }
+        }
+      }
+    }
+  }
+}
+
+# Attaching a life-cycle policy to a template
+PUT _index_template/mysql_logs_template
+{
+  "index_patterns": ["mysql-*"], 
+  "template":{
+    "settings":{
+      "index.lifecycle.name":"hot_simple_policy", 
+      "index.lifecycle.rollover_alias":"mysql-logs-alias" 
+    }
+  }
+}
+
+# Setting the index as writable for the alias
+PUT mysql-index-000001   
+{
+  "aliases": {
+    "mysql-logs-alias": {   
+      "is_write_index":true 
+    }
+  }
+}
+
+# Creating an advanced life-cycle policy
+PUT _ilm/policy/hot_warm_delete_policy
+{
+  "policy": {
+    "phases": {
+      "hot": { 
+        "min_age": "1d", 
+        "actions": {
+          "rollover": {  
+            "max_size": "40gb",
+            "max_age": "6d"
+          },
+          "set_priority": { 
+            "priority": 50
+          }
+        }
+      },
+      "warm": { 
+        "min_age": "7d", 
+        "actions": {
+          "shrink": {    
+            "number_of_shards": 1
+          }
+        }
+      },
+      "delete": {      
+        "min_age": "30d", 
+        "actions": {
+          "delete": {}
+        }
+      }
+    }
+  }
+}
 
 
 
