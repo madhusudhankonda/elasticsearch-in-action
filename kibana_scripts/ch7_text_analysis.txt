@@ -6,3 +6,408 @@
 ## follow the Ch2 Getting Started wiki page here: https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-7.-Text Analysis
 ##
 ## Please let me know if you find any issues with this script
+
+## 
+## A handy scripts file for hands-on exercises on Kibana
+## Copy the whole contents of this file to Kibana's DevTools
+
+## If you wish to follow the running commentary for these scripts, 
+## follow the Ch2 Getting Started wiki page here: https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-7.-Text Analysis
+##
+## Please let me know if you find any issues with this script
+
+GET _analyze
+{
+  "tokenizer": "standard", 
+  "filter": ["stemmer"], 
+  "text": ["Martini. Shaken. Not Stirred"]
+}
+
+GET _analyze
+{
+  "tokenizer": "standard", 
+  "filter": ["synonym"], 
+  "text": ["TWO birds ONE stone"]
+}
+
+PUT ch7_synonymn_test_index4/_doc/1
+{
+  "quote": "Imagination is more important than knowledge"
+}
+
+GET ch7_synonymn_test_index4/_search
+{
+  "query": {
+    "match": {
+      "quote": "passion"
+    }
+  }
+}
+
+DELETE ch7_synonymn_test_index
+PUT ch7_synonymn_test_index2
+{
+  "settings": {
+    "index": {
+      "analysis": {
+        "analyzer": {
+          "synonym": {
+            "tokenizer": "standard",
+            "filter": [ "synonym" ]
+          }
+        },
+        "filter": {
+          "synonym": {
+            "type": "synonym",
+            "lenient": true,
+            "synonyms": [ "curiosity, passion => imagination" ]
+          }
+        }
+      }
+    }
+  }
+}
+
+PUT ch7_synonymn_test_index3
+{
+  "settings": {
+    "index": {
+      "analysis": {
+        "filter": {
+          "synonym": {
+            "type": "synonym",
+            "synonyms": [
+              "imaginatiion, passion => imagine",
+              "imagination, passion"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+DELETE ch7_synonymn_test_index4
+
+PUT ch7_synonymn_test_index4
+{
+  "settings": {
+    "index": {
+      "analysis": {
+        "analyzer": {
+          "my_synonym_analyzer": {
+            "tokenizer": "standard",
+            "filter": [ "lowercase","my_synonym" ]
+          }
+        },
+        "filter": {
+          "my_synonym": {
+            "type": "synonym",
+            "lenient": true,
+            "synonyms": [ "imagination, passion" ]
+          }
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "quote":{
+        "type": "text",
+        "analyzer": "my_synonym_analyzer"
+      }
+    }  
+  }
+}
+
+
+PUT ch7_synonymn_test_index4/_doc/1
+{
+  "quote": "Imagination is more important than knowledge"
+}
+
+GET ch7_synonymn_test_index4/_search
+{
+  "query": {
+    "match": {
+      "quote": "passion"
+    }
+  }
+}
+
+GET _analyze
+{
+  "text": ["one two"],
+  "tokenizer": "whitespace"
+}
+
+GET _analyze
+{
+  "text": ["K8s"],
+  "tokenizer": "letter"
+}
+GET _analyze
+{
+  "text": ["Peter Piper picked a peck of pickled-peppers"],
+  "tokenizer": "whitespace"
+}
+
+GET _analyze
+{
+  "tokenizer": "standard", 
+  "text": ["The movie was sick!!! Hilarious :) :) and witty ;) but all in all - it’s a killer <thumbs_up>"],
+  "char_filter": ["html_strip"]
+  
+}
+
+GET /_analyze
+{
+  "tokenizer": "keyword",
+  "char_filter": [
+    "html_strip"
+  ],
+  "text": "<p>I&apos;m so <b>happy</b>!</p>"
+}
+
+
+# Default "standard" analyser
+GET _analyze
+{
+  "text": "Hot cup of ☕ and a 🍿is a Weird Combo :(!!"
+}
+
+# Specifying the standard analyser  
+GET _analyze
+{
+  "analyzer": "standard",
+  "text": "Hot cup of ☕ and a 🍿is a Weird Combo :(!!"
+}
+
+# Specifying the standard analyser with stop fitler
+GET _analyze
+{
+  "tokenizer": "standard",
+  "text": "Hot cup of ☕ and a 🍿is a Weird Combo :(!!",
+  "filter": ["lowercase"]
+}
+
+#Configuring analyzers
+
+POST _analyze
+{
+ "text": ["<h1>HEY how are YOU</h1>"],
+ "tokenizer": "simple", 
+ "filter": ["lowercase"]
+}
+
+PUT my_index_with_stopwords
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "standard_with_stopwords":{
+          "type":"standard",
+          "stopwords":"_english_"
+        }
+      }
+    }
+  }
+}
+
+POST my_index_with_stopwords/_analyze
+{
+  "text": ["Hot cup of ☕ and a 🍿is a Weird Combo :(!!"],
+  "analyzer": "standard_with_stopwords"
+}
+
+DELETE my_index_with_stopwords_hindi
+  
+PUT my_index_with_stopwords_hindi
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "standard_with_stopwords_hindi":{
+          "type":"standard",
+          "stopwords":"_hindi_"
+        }
+      }
+    }
+  }
+}
+
+POST my_index_with_stopwords_hindi/_analyze
+{
+  "text": ["आप कैसे हैं?"],
+  "analyzer": "standard_with_stopwords_hindi"
+}
+
+POST my_index_with_stopwords_hindi/_analyze
+{
+  "text": ["आप क्या कर रहे हो?"],
+  "analyzer": "standard_with_stopwords_hindi"
+}
+
+# Index with custom swear words 
+PUT index_with_swear_stopwords
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "swearwords_analyzer":{
+          "type":"standard",
+          "stopwords_path":"swearwords.txt"
+        }
+      }
+    }
+  }
+}
+
+#Test it
+POST index_with_swear_stopwords/_analyze
+{
+  "text": ["Damn, that sucks!"],
+  "analyzer": "swearwords_analyzer"
+}
+
+
+## Setting token length
+DELETE my_index_with_max_token_length
+PUT my_index_with_max_token_length
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "standard_max_token_length":{
+          "type":"standard",
+          "max_token_length":7
+        }
+      }
+    }
+  }
+}
+
+POST my_index_with_max_token_length/_analyze
+{
+  "text": ["elasticsearch"],
+  "analyzer": "standard_max_token_length"
+}
+
+# Simple analyzer
+
+POST _analyze
+{
+  "text": ["Lukša's K8s in Action"],
+  "analyzer": "simple"
+}
+
+# Whitespace Analyzer
+POST _analyze
+{
+  "text":"Peter_Piper picked a peck of PICKLED-peppers!!",
+  "analyzer": "whitespace"
+}
+
+# Keyword Analyzer
+POST _analyze
+{
+  "text":"Elasticsearch in Action",
+  "analyzer": "keyword"
+}
+
+# Fingerprint analyzer
+POST _analyze
+{
+  "text": "A dosa is a thin pancake or crepe originating from South India. It is made from a fermented batter consisting of lentils and rice.",
+  "analyzer": "fingerprint"
+}
+
+# Pattern
+POST _analyze
+{
+  "text":"Is is true?",
+  "pattern": "[tT]rue|[yY]es",
+  "analyzer": "pattern"
+}
+
+DELETE index_with_pattern_analyzer
+PUT index_with_pattern_analyzer
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "pattern_analyzer": {
+          "type":      "pattern",
+          "pattern":   "[a-zA-Z]{3}", 
+          "lowercase": true
+        }
+      }
+    }
+  }
+}
+DELETE index_with_pattern_analyzer4
+PUT index_with_dash_pattern_analyzer
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "pattern_analyzer": {
+          "type":      "pattern",
+          "pattern":   "[-]", 
+          "lowercase": true
+        }
+      }
+    }
+  }
+}
+
+POST index_with_dash_pattern_analyzer/_analyze
+{
+  "text": "1234-5678-9000-0000",
+  "analyzer": "pattern_analyzer"
+}
+
+# English Language Analyzer
+POST _analyze
+{
+  "text": "She sells sea shells",
+  "analyzer": "english"
+}
+
+# German Language Analyzer
+POST _analyze
+{
+  "text": "Guten Morgen",
+  "analyzer": "german"
+}
+
+# English Language Analyzer
+POST _analyze
+{
+  "text": "नमस्ते कैसी हो तुम",
+  "analyzer": "hindi"
+}
+
+DELETE index_with_custom_english_analyzer
+
+# Custom Language Analyser with stopwords
+PUT index_with_custom_english_analyzer
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "index_with_custom_english_analyzer":{
+          "type":"english",
+          "stopwords":["a","an","and","is"]
+        }
+      }
+    }
+  }
+}
+
+POST index_with_custom_english_analyzer/_analyze
+{
+  "text":"A dog is for a life",
+  "analyzer":"index_with_custom_english_analyzer"
+}
+
