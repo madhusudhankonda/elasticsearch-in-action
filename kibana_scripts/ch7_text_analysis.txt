@@ -411,3 +411,217 @@ POST index_with_custom_english_analyzer/_analyze
   "analyzer":"index_with_custom_english_analyzer"
 }
 
+# Stemming
+POST index_with_custom_english_analyzer/_analyze
+{
+  "text":"Author authors authoring authored authorization authority",
+  "analyzer":"english"
+}
+
+DELETE index_with_stem_exclusion_english_analyzer
+
+# Custom Language Analyser with stem_exception
+PUT index_with_stem_exclusion_english_analyzer
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "stem_exclusion_english_analyzer":{
+          "type":"english",
+          "stem_exclusion":["authority","authorization"]
+        }
+      }
+    }
+  }
+}
+
+POST index_with_stem_exclusion_english_analyzer/_analyze
+{
+  "text": "No one can challenge my authority without my authorization",
+  "analyzer": "stem_exclusion_english_analyzer"
+}
+
+DELETE index_with_custom_analyzer
+## Custom Analyzer
+PUT index_with_custom_analyzer
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "custom_analyzer":{
+          "type":"custom",
+          "char_filter":["html_strip"],
+          "tokenizer":"standard",
+          "filter":["uppercase"]
+        }
+      }
+    }
+  }
+}
+
+POST index_with_custom_analyzer/_analyze
+{
+  "text": "<H1>HELLO, WoRLD</H1>",
+  "analyzer": "custom_analyzer"
+  
+}
+
+# Advanced Custom Analyser
+PUT index_with_custom_greek_analyzer
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "custom_analyzer":{
+          "type":"custom",
+          "char_filter":["greek_symbol_mapper"],
+          "tokenizer":"standard",
+          "filter":["uppercase"]
+        }
+      },
+      "char_filter": {
+        "greek_symbol_mapper":{
+          "type":"mapping",
+          "mappings":[
+            "α => alpha",
+            "β => Beta",
+            "γ => Gamma"
+          ]
+        }
+      }
+    }
+  }
+}
+
+POST index_with_custom_greek_analyzer/_analyze
+{
+  "text": "α and β are roots of a quadratic equation",
+  "analyzer": "custom_analyzer"
+}
+
+DELETE index_with_parse_greek_letters_custom_analyzer
+PUT index_with_parse_greek_letters_custom_analyzer
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "greek_letter_custom_analyzer":{
+          "type":"custom",
+          "char_filter":["greek_symbol_mapper"],
+          "tokenizer":"standard",
+          "filter":["lowercase", "greek_keep_words"]
+        }
+      },
+      "char_filter": {
+        "greek_symbol_mapper":{
+          "type":"mapping",
+          "mappings":[
+            "α => alpha",
+            "β => Beta",
+            "γ => Gamma"
+          ]
+        }
+      },
+      "filter": {
+        "greek_keep_words":{
+          "type":"keep",
+          "keep_words":["alpha", "beta", "gamma"]
+        }
+      }
+    }
+  }
+}
+
+POST index_with_parse_greek_letters_custom_analyzer/_analyze
+{
+  "text": "α and β are roots of a quadratic equation. γ isn't",
+  "analyzer": "greek_letter_custom_analyzer"
+}
+
+## Character Filters
+
+# HTML Strip Character Filter
+POST _analyze
+{
+  "text":"<h1>Where is my cheese?</h1>",
+  "tokenizer": "standard", 
+  "char_filter": ["html_strip"]
+}
+
+DELETE index_with_html_strip_filter
+PUT index_with_html_strip_filter
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "custom_html_strip_filter_analyzer":{
+          "tokenizer":"keyword",
+          "char_filter":["my_html_strip_filter"]
+        }
+      },
+      "char_filter": {
+        "my_html_strip_filter":{
+          "type":"html_strip",
+          "escaped_tags":["h1"]
+        }
+      }
+    }
+  }
+}
+
+POST index_with_html_strip_filter/_analyze
+{
+  "text": "<h1>Hello,</h1> <h2>World!</h2>",
+  "analyzer": "custom_html_strip_filter_analyzer"
+}
+
+# Mapping Char Filter
+POST _analyze
+{
+  "text": "I am from UK",
+  "char_filter": [
+    {
+      "type": "mapping",
+      "mappings": [
+        "UK => United Kingdom"
+      ]
+    }
+  ]
+}
+
+DELETE index_with_mapping_char_filter
+
+# Custom analyzer wiht a mapping characte filter
+PUT index_with_mapping_char_filter
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_social_abbreviations_analyzer": {
+          "tokenizer": "keyword",
+          "char_filter": [
+            "my_social_abbreviations"
+          ]
+        }
+      },
+      "char_filter": {
+        "my_social_abbreviations": {
+          "type": "mapping",
+          "mappings": [
+            "LOL => laughing out loud",
+            "BRB => be right back",
+            "OMG => oh my god"
+          ]
+        }
+      }
+    }
+  }
+}
+
+POST index_with_mapping_char_filter/_analyze
+{
+  "text": "LOL",
+  "analyzer": "my_social_abbreviations_analyzer"
+}
+
+# Pattern replce charcter filter
