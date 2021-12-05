@@ -625,3 +625,390 @@ POST index_with_mapping_char_filter/_analyze
 }
 
 # Pattern replce charcter filter
+DELETE index_with_pattern_replace_filter
+PUT index_with_pattern_replace_filter
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_pattern_replace_analyzer":{
+          "tokenizer":"keyword",
+          "char_filter":["pattern_replace_filter"]
+        }
+      },
+      "char_filter": {
+        "pattern_replace_filter":{
+          "type":"pattern_replace",
+          "pattern":"_",
+          "replacement":"-"
+        }
+      }
+    }
+  }
+}
+
+POST index_with_pattern_replace_filter/_analyze
+{
+  "text": "Apple_Boy_Cat",
+  "analyzer": "my_pattern_replace_analyzer"
+}
+
+PUT my-index-00001
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_analyzer": {
+          "tokenizer": "standard",
+          "char_filter": [
+            "my_char_filter"
+          ]
+        }
+      },
+      "char_filter": {
+        "my_char_filter": {
+          "type": "pattern_replace",
+          "pattern": "(\\d+)-(?=\\d)",
+          "replacement": "$1_"
+        }
+      }
+    }
+  }
+}
+
+
+POST my-index-00001/_analyze
+{
+  "analyzer": "my_analyzer",
+  "text": "123-456-789"
+}
+
+## Tokenizers
+
+# Standard tokenizer
+POST _analyze
+{
+  "text": "Hello,cruel world!",
+  "tokenizer": "standard"
+}
+
+# Cutom stadard tokenizer
+PUT index_with_custom_standard_tokenizer
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "custom_token_length_analyzer": {
+          "tokenizer": "custom_token_length_tokenizer"
+        }
+      },
+      "tokenizer": {
+        "custom_token_length_tokenizer": {
+          "type": "standard",
+          "max_token_length": 2
+        }
+      }
+    }
+  }
+}
+
+POST index_with_custom_standard_tokenizer/_analyze
+{
+  "text": "Bond",
+  "analyzer": "custom_token_length_analyzer"
+}
+
+# URL Tokenizer 
+POST _analyze
+{
+  "text": "My website is https://localhost:9090",
+  "tokenizer": "uax_url_email"
+}
+
+# Email 
+POST _analyze
+{
+  "text": "my email is dimpy@dimpy.com",
+  "tokenizer": "uax_url_email"
+}
+
+# N-Gram Tokenizer
+POST _analyze
+{
+  "text": "Bond",
+  "tokenizer": "ngram"
+}
+
+# Custom n-gram tokenizer
+DELETE index_with_ngram_tokenizer
+PUT index_with_ngram_tokenizer
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "ngram_analyzer":{
+          "tokenizer":"ngram_tokenizer"
+        }
+      },
+      "tokenizer": {
+        "ngram_tokenizer":{
+          "type":"ngram",
+          "min_gram":2,
+          "max_gram":3,
+          "token_chars":[
+            "letter"
+          ]
+        }
+      }
+    }
+  }
+}
+
+POST index_with_ngram_tokenizer/_analyze
+{
+  "text": "bond",
+  "analyzer": "ngram_analyzer"
+}
+
+#Edge-ngram
+
+POST _analyze
+{
+  "text":"hello",
+  "tokenizer": "edge_ngram"
+}
+
+DELETE index_with_edge_ngram
+PUT index_with_edge_ngram
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "edge_ngram_analyzer":{
+          "tokenizer":"my_edge_ngram_tokenizer"
+        }
+      },
+      "tokenizer": {
+        "my_edge_ngram_tokenizer":{
+          "type":"edge_ngram",
+          "min_gram":2,
+          "max_gram":6,
+          "token_chars":["letter","digit"]
+        }
+      }
+    }
+  }
+}
+
+POST index_with_edge_ngram/_analyze
+{
+  "text": "bond",
+  "analyzer": "edge_ngram_analyzer"
+}
+
+## Simple Pattern Analyzer
+POST _analyze
+{
+  "text": "hello",
+  "tokenizer": "simple_pattern"
+}
+
+DELETE index_simple_pattern_analyzer
+PUT index_simple_pattern_analyzer 
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_simple_pattern_analyzer":{
+          "tokenizer":"simple_pattern_tokenizer"
+        }
+      },
+      "tokenizer": {
+        "simple_pattern_tokenizer":{
+          "type": "simple_pattern",
+          "pattern":"[a-zA-Z]{2}"
+        }
+      }
+    }
+  }
+}
+
+POST index_simple_pattern_analyzer/_analyze
+{
+  "text": "sugarfree",
+  "analyzer": "my_simple_pattern_analyzer"
+}
+
+DELETE index_with_simple_pattern_split_analyzer
+#Simple pattern split tokenizer
+PUT index_with_simple_pattern_split_analyzer
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "simple_pattern_split_analyzer":{
+          "tokenizer":"simple_pattern_split_tokenizer"
+        }
+      }
+      ,"tokenizer": {
+         "simple_pattern_split_tokenizer":{
+           "type":"simple_pattern_split",
+           "pattern":">"
+         }
+      }
+    }
+  }
+}
+
+POST index_with_simple_pattern_split_analyzer/_analyze
+{
+  "text": "c>file",
+  "analyzer": "simple_pattern_split_analyzer"
+}
+
+# Path Hierarchy
+POST _analyze
+{
+  "text": "/Volumes/doe/documents",
+  "tokenizer": "path_hierarchy"
+}
+
+## Token Fitlers
+GET _analyze
+{
+  "tokenizer" : "standard",
+  "filter" : ["uppercase","reverse"],
+  "text" : "bond"
+}
+
+PUT index_with_token_filters
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "token_filter_analyser": {
+          "tokenizer": "standard",
+          "filter": [
+            "uppercase",
+            "reverse"
+          ]
+        }
+      }
+    }
+  }
+}
+
+POST index_with_token_filters/_analyze
+{
+  "analyzer": "token_filter_analyser",
+  "text": "bond"
+}
+
+#Stemmer
+
+POST _analyze
+{
+  "tokenizer": "standard",
+  "filter": ["stemmer"],
+  "text": "barking is my life"
+}
+
+#Shingles
+POST _analyze
+{
+  "tokenizer": "standard",
+  "filter": ["shingle"],
+  "text": "java python go"
+}
+
+DELETE index_with_shingle
+PUT index_with_shingle
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "shingles_analyzer":{
+          "tokenizer":"standard",
+          "filter":["shingles_filter"]
+        }
+      },
+      "filter": {
+        "shingles_filter":{
+          "type":"shingle",
+          "min_shingle_size":2,
+          "max_shingle_size":3,
+          "output_unigrams":false
+        }
+      }
+    }
+  }
+}
+
+POST index_with_shingle/_analyze
+{
+  "text": "java python go",
+  "analyzer": "shingles_analyzer"
+}
+
+DELETE index_with_synonyms
+
+
+PUT index_with_synonyms
+{
+  "settings": {
+    "analysis": {
+      "filter": {
+        "synonyms_filter":{
+          "type":"synonym",
+         "synonyms":[ "soccer => football"]
+        }
+      }
+    }
+  }
+}
+
+POST index_with_synonyms/_analyze
+{
+  "text": "What's soccer?",
+  "tokenizer": "standard", 
+  "filter": ["synonyms_filter"]
+}
+
+PUT index_with_synonyms_analyzer
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "synonyms_analyzer":{
+          "type":"standard",
+          "filter":["synonyms_filter"]
+        }
+      }
+      ,"filter": {
+        "synonyms_filter":{
+          "type":"synonym",
+          "synonyms":["lol => Laughing out loud"]
+        }
+      }
+    }
+  }
+}
+
+POST index_with_synonyms_analyzer/_analyze
+{
+  "text":"lol",
+  "analyzer": "synonyms_analyzer"
+  
+}
+
+GET index_with_synonyms/_search
+{
+  "query": {
+    "match": {
+      "sport": {
+        "query": "football",
+        "analyzer": "synonyms_analyzer"
+      }
+    }
+  }
+}
