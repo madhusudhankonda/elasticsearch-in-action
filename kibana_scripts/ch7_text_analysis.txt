@@ -7,166 +7,25 @@
 ##
 ## Please let me know if you find any issues with this script
 
-## 
-## A handy scripts file for hands-on exercises on Kibana
-## Copy the whole contents of this file to Kibana's DevTools
-
-## If you wish to follow the running commentary for these scripts, 
-## follow the Ch2 Getting Started wiki page here: https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-7.-Text Analysis
-##
-## Please let me know if you find any issues with this script
-
+# A standard (implicit) analyzer
 GET _analyze
 {
-  "tokenizer": "standard", 
-  "filter": ["stemmer"], 
-  "text": ["Martini. Shaken. Not Stirred"]
+  "text": "James Bond 007"
 }
 
+# A simple analyzer
 GET _analyze
 {
-  "tokenizer": "standard", 
-  "filter": ["synonym"], 
-  "text": ["TWO birds ONE stone"]
+  "text": "James Bond 007",
+  "analyzer": "simple"
 }
 
-PUT ch7_synonymn_test_index4/_doc/1
-{
-  "quote": "Imagination is more important than knowledge"
-}
-
-GET ch7_synonymn_test_index4/_search
-{
-  "query": {
-    "match": {
-      "quote": "passion"
-    }
-  }
-}
-
-DELETE ch7_synonymn_test_index
-PUT ch7_synonymn_test_index2
-{
-  "settings": {
-    "index": {
-      "analysis": {
-        "analyzer": {
-          "synonym": {
-            "tokenizer": "standard",
-            "filter": [ "synonym" ]
-          }
-        },
-        "filter": {
-          "synonym": {
-            "type": "synonym",
-            "lenient": true,
-            "synonyms": [ "curiosity, passion => imagination" ]
-          }
-        }
-      }
-    }
-  }
-}
-
-PUT ch7_synonymn_test_index3
-{
-  "settings": {
-    "index": {
-      "analysis": {
-        "filter": {
-          "synonym": {
-            "type": "synonym",
-            "synonyms": [
-              "imaginatiion, passion => imagine",
-              "imagination, passion"
-            ]
-          }
-        }
-      }
-    }
-  }
-}
-
-DELETE ch7_synonymn_test_index4
-
-PUT ch7_synonymn_test_index4
-{
-  "settings": {
-    "index": {
-      "analysis": {
-        "analyzer": {
-          "my_synonym_analyzer": {
-            "tokenizer": "standard",
-            "filter": [ "lowercase","my_synonym" ]
-          }
-        },
-        "filter": {
-          "my_synonym": {
-            "type": "synonym",
-            "lenient": true,
-            "synonyms": [ "imagination, passion" ]
-          }
-        }
-      }
-    }
-  },
-  "mappings": {
-    "properties": {
-      "quote":{
-        "type": "text",
-        "analyzer": "my_synonym_analyzer"
-      }
-    }  
-  }
-}
-
-
-PUT ch7_synonymn_test_index4/_doc/1
-{
-  "quote": "Imagination is more important than knowledge"
-}
-
-GET ch7_synonymn_test_index4/_search
-{
-  "query": {
-    "match": {
-      "quote": "passion"
-    }
-  }
-}
-
+# Configuring an analyzer on the fly
 GET _analyze
 {
-  "text": ["one two"],
-  "tokenizer": "whitespace"
-}
-
-GET _analyze
-{
-  "text": ["K8s"],
-  "tokenizer": "letter"
-}
-GET _analyze
-{
-  "text": ["Peter Piper picked a peck of pickled-peppers"],
-  "tokenizer": "whitespace"
-}
-
-GET _analyze
-{
-  "tokenizer": "standard", 
-  "text": ["The movie was sick!!! Hilarious :) :) and witty ;) but all in all - it’s a killer <thumbs_up>"],
-  "char_filter": ["html_strip"]
-  
-}
-
-GET /_analyze
-{
-  "tokenizer": "keyword",
-  "char_filter": [
-    "html_strip"
-  ],
-  "text": "<p>I&apos;m so <b>happy</b>!</p>"
+  "tokenizer": "path_hierarchy",
+  "filter": ["uppercase"],
+  "text": "/Volumes/FILES/Dev"
 }
 
 
@@ -398,7 +257,7 @@ PUT index_with_custom_english_analyzer
       "analyzer": {
         "index_with_custom_english_analyzer":{
           "type":"english",
-          "stopwords":["a","an","and","is"]
+          "stopwords":["a","an","is","and","for"]
         }
       }
     }
