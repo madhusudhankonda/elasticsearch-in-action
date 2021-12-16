@@ -483,6 +483,18 @@ POST index_with_mapping_char_filter/_analyze
   "analyzer": "my_social_abbreviations_analyzer"
 }
 
+#Character filter using mappings from a file
+POST _analyze
+{
+  "text": "FBI and CIA are USA's security organizations",
+  "char_filter": [
+    {
+      "type": "mapping",
+      "mappings_path": "secret_organizations.txt"
+    }
+  ]
+}
+
 # Pattern replce charcter filter
 DELETE index_with_pattern_replace_filter
 PUT index_with_pattern_replace_filter
