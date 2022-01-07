@@ -396,6 +396,102 @@ POST index_with_parse_greek_letters_custom_analyzer/_analyze
   "text": "α and β are roots of a quadratic equation. γ isn't",
   "analyzer": "greek_letter_custom_analyzer"
 }
+## Specifying the analysers
+
+# Setting analyzers at field level during index creation
+PUT authors_with_field_level_analyzers
+{
+  "mappings": {
+    "properties": {
+      "name":{
+        "type": "text" 
+      },
+      "about":{
+        "type": "text",
+        "analyzer": "english" 
+      },
+      "description":{
+        "type": "text",
+        "fields": {
+          "my":{
+            "type": "text",
+            "analyzer": "fingerprint" 
+          }
+        }
+      }
+    }
+  }
+}
+# Creating an index with a default analyzer
+PUT authors_with_default_analyzer
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "default":{ 
+          "type":"keyword"
+        }
+      }
+    }
+  }
+}
+# Test the analyzer
+PUT authors_with_default_analyzer/_analyze
+{
+  "name":"John Doe" 
+}
+
+# Setting the analyzer alongside a search query
+GET authors_index_for_search_analyzer/_search
+{
+  "query": {
+    "match": { 
+      "author_name": {
+        "query": "M Konda",
+        "analyzer": "simple" 
+      }
+    }
+  }
+}
+# Setting a search analyzer at a field level
+PUT authors_index_with_both_analyzers_field_level
+{
+  "mappings": {
+    "properties": {
+      "author_name":{
+        "type": "text",
+        "analyzer": "stop",
+        "search_analyzer": "simple"
+      }
+    }
+  }
+}
+# Setting a search analyzer at a field level
+PUT authors_index_with_both_analyzers_field_level
+{
+  "mappings": {
+    "properties": {
+      "author_name":{
+        "type": "text",
+        "analyzer": "stop",
+        "search_analyzer": "simple"
+      }
+    }
+  }
+}
+# Specifying index and search analyzers during the index creation
+PUT authors_index_with_both_analyzers_field_level
+{
+  "mappings": {
+    "properties": {
+      "author_name":{
+        "type": "text",
+        "analyzer": "standard",
+        "search_analyzer": "simple"
+      }
+    }
+  }
+}
 
 ## Character Filters
 
