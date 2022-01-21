@@ -1,1 +1,221 @@
 # Search Basics
+
+PUT movies
+{
+  "mappings": {
+    "properties": {
+      "title": {
+        "type": "text",
+        "fields": {
+          "original": {
+            "type": "keyword"
+          }
+        }
+      },
+      "synopsis": {
+        "type": "text"
+      },
+      "actors": {
+        "type": "text"
+      },
+      "director": {
+        "type": "text"
+      },
+      "rating": {
+        "type": "half_float"
+      },
+      "release_date": {
+        "type": "date",
+        "format": "dd-MM-yyyy"
+      },
+      "certificate": {
+        "type": "keyword"
+      },
+      "genre": {
+        "type": "text"
+      }
+    }
+  }
+}
+
+## Copy the contents of top-movies.json and index the movies using bulk API
+
+GET movies/_search
+
+# Term query
+GET movies/_search
+{
+  "query": {
+    "term": {
+      "certificate": "R"
+    }
+  }
+}
+
+#Term query that wouldn't return results 
+GET movies/_search
+{
+  "query": {
+    "term": {
+      "title": "the godfather" 
+    }
+  }
+}
+
+# Term query that returns results with highligts
+GET movies/_search
+{
+  "_source": false, 
+  "query": {
+    "term": {
+      "title": {
+        "value": "godfather"
+      }
+    }
+  },
+  "highlight": {
+    "fields": {
+      "title": {}
+    }
+  }
+}
+# Term query that returns results with custom highligt tags
+GET movies/_search
+{
+  "_source": false, 
+  "query": {
+    "term": {
+      "title": {
+        "value": "godfather"
+      }
+    }
+  },
+  "highlight": {
+    "pre_tags": "{{",
+    "post_tags": "}}", 
+    "fields": {
+      "title": {}
+    }
+  }
+}
+
+# Terms query
+GET movies/_search
+{
+  "query": {
+    "terms": {
+      "certificate": ["PG-13","R"]
+    }
+  }
+}
+
+#IDs query
+GET movies/_search
+{
+  "query": {
+    "ids": {
+      "values": [10,4,6,8]
+    }
+  }
+}
+
+#Exists query
+GET movies/_search
+{
+  "query": {
+    "exists": {
+      "field": "title2"
+    }
+  }
+}
+
+# Range query
+GET movies/_search
+{
+  "query": {
+    "range": {
+      "rating": {
+        "gte": 9.0,
+        "lte": 9.5
+      }
+    }
+  }
+}
+
+# Range query with a date
+GET movies/_search
+{
+  "query": {
+    "range": {
+      "release_date": {
+        "gte": "01-01-1970"
+      }
+    }
+  },
+  "sort": [
+    {
+      "release_date": {
+        "order": "asc"
+      }
+    }
+  ]
+}
+
+# Wildcard query
+GET movies/_search
+{
+  "query": {
+    "wildcard": {
+      "title": {
+        "value": "god*"
+      }
+    }
+  }
+}
+
+# Prefix query
+GET movies/_search
+{
+  "query": {
+    "prefix": {
+      "title": {
+        "value": "red"
+      }
+    }
+  }
+}
+
+# Fuzzy query
+GET movies/_search
+{
+  "query": {
+    "fuzzy": {
+      "genre": {
+        "value": "rama",
+        "fuzziness": 1
+      }
+    }
+  },
+  "highlight": {
+    "fields": {
+      "genre": {}
+    }
+  }
+}
+
+
+
+GET movies/_mapping
+
+GET movies/_search
+{
+  "size": 0, 
+  "aggs": {
+    "NAME": {
+      "terms": {
+        "field": "certificate",
+        "size": 10
+      }
+    }
+  }
+}
