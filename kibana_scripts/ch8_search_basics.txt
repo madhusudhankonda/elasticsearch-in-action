@@ -1,1 +1,530 @@
 # Search Basics
+# URI search
+# Search a movie by title
+GET movies/_search
+GET movies/_search?q=title:Godfather
+
+# Search a movie by multiple titles
+GET movies/_search?q=title:Godfather Knight Shawshank
+
+#Fetch a specific title AND an actor combination
+GET movies/_search?q=title:Knight actors:Bale
+
+#Fetch a specific title OR an actor combination
+GET movies/_search?q=title:Godfather actors:Bale
+
+# Setting a default_operator
+GET movies/_search?q=title:Godfather actors:Bale&default_operator=AND
+
+# Additional query parameters
+
+GET movies/_search?q=title:Knight actors:(bale AND ledger) rating:(>=9.0 AND <=9.5)&from=0&size=10&explain=true&sort=rating&default_operator=AND
+
+
+GET movies/_search?q=title:Godfather actors:(Brando OR Pacino) rating:(>=9.0 AND <=9.5)&from=0&size=10&explain=true&sort=rating&default_operator=AND
+
+GET movies/_search
+
+#Query String
+GET movies/_search
+{
+  "query": {
+    "query_string": {
+      "default_field": "title",
+      "query": "Knight Redemption Lord Pulp",
+      "default_operator": "OR"
+    }
+  }
+}
+
+# Query DSL sample query
+GET movies/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "Lord",
+      "fields": ["synopsis","title"]
+    }
+  }
+}
+
+GET movies/_search
+{
+  "size": 0, 
+  "aggs": {
+    "average_movie_rating": {
+      "avg": {
+        "field": "rating"
+      }
+    }
+  }
+}
+
+# Leaf query
+GET movies/_search
+{
+  "query": {
+    "match_phrase": {
+      "synopsis": "A meek hobbit from the shire and eight companions"
+    }
+  }
+}
+GET movies/_search
+
+# Compound query example
+GET movies/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {
+          "title": "Godfather"
+        }}
+      ],
+      "must_not": [
+        {
+          "range": {
+          "rating": {
+            "lt": 9.0
+          }
+        }}
+      ], 
+      "should": [
+        {
+          "match": {
+          "actors": "Pacino"
+        }}
+      ], 
+      "filter": [
+        {
+          "term": {
+            "actors": "brando"
+          }
+        }
+      ]
+    }
+  }
+}
+
+
+# Match query
+GET movies/_search
+{
+  "query": {
+    "match": {
+      "director": "Francis"
+    }
+  }
+}
+
+#Match query with size
+GET movies/_search
+{
+  "size": 10001, 
+  "query": {
+    "match_all": {}
+  }
+}
+
+#Reset the max results setting
+PUT movies/_settings
+{
+  "max_result_window":10001
+}
+
+# Paginated results
+GET movies/_search
+{
+  "size": 100, 
+  "from": 3, 
+  "query": {
+    "match_all": {}
+  }
+}
+
+# Deep pagination
+# search_after
+
+# Sort
+GET movies/_search
+{
+  "size": 10, 
+  "query": {
+    "match": {
+      "title": "Godfather"
+    }
+  },
+  "sort": [{
+    "rating": {"order": "asc"}
+    }
+  ]
+}
+
+# Sort by score (no sort - default by score desc)
+GET movies/_search
+{
+  "size": 10, 
+  "query": {
+    "match": {
+      "title": "Godfather"
+    }
+  }
+}
+
+# Sort by score - mention the sort )
+GET movies/_search
+{
+  "size": 10, 
+  "query": {
+    "match": {
+      "title": "Godfather"
+    }
+  },
+  "sort": [
+    "_score"
+  ]
+}
+# Sort by score asc
+GET movies/_search
+{
+  "size": 10, 
+  "query": {
+    "match": {
+      "title": "Godfather"
+    }
+  },
+  "sort": [
+    {"_score":{"order":"asc"}}
+  ]
+}
+
+# Sort by a field desc
+GET movies/_search
+{
+  "size": 10, 
+  "query": {
+    "match": {
+      "genre": "crime"
+    }
+  },
+  "sort": [
+    {"rating":{"order":"desc"}}
+  ]
+}
+
+# Sort by multiple fields asc
+GET movies/_search
+{
+  "track_scores":true,
+  "size": 10, 
+  "query": {
+    "match": {
+      "genre": "crime"
+    }
+  },
+  "sort": [
+    {"rating":{"order":"asc"}},
+    {"release_date":{"order":"asc"}}
+  ]
+}
+
+# Manipulating search responses
+# Suppressing the source document
+GET movies/_search
+{
+  "_source": false, 
+  "query": {
+    "match": {
+      "certificate": "R"
+    }
+  }
+}
+# Selected fields
+GET movies/_search
+{
+  "_source": false, 
+  "query": {
+    "match": {
+      "certificate": "R"
+    }
+  },
+  "fields": [
+    "title*",
+    "rating"
+  ]
+}
+
+# Source filtering
+GET movies/_search
+{
+  "_source": ["title*","synopsis", "rating"], 
+  "query": {
+    "match": {
+      "certificate": "R"
+    }
+  }
+}
+
+# Source filtering with a script field
+GET movies/_search
+{
+  "_source": ["title*","synopsis", "rating"], 
+  "query": {
+    "match": {
+      "certificate": "R"
+    }
+  },
+  "script_fields": {
+    "top_rated_movie": {
+      "script": {
+        "lang": "painless",
+        "source": "if (doc['rating'].value > 9.0) 'true'; else 'false'"
+      }
+    }
+  }
+}
+
+# Source filtering using includes and excludes
+GET movies/_search
+{
+  "_source": {
+    "includes": ["title*","synopsis","genre"],
+    "excludes": ["title.original"]
+  }, 
+  "query": {
+    "match": {
+      "certificate": "R"
+    }
+  }
+}
+
+# Return everything except synoposis and actors
+GET movies/_search
+{
+  "_source": {
+    "excludes": ["synopsis","actors"]
+  }, 
+  "query": {
+    "match": {
+      "certificate": "R"
+    }
+  }
+}
+
+# Search template
+
+PUT _scripts/actor_movie_template
+{
+  "script":{
+    "lang": "mustache", 
+    "source": {
+      "query":{
+        "match":{
+          "actors":"{{actor}}"
+        }
+      }
+    }
+  }
+}
+
+POST _render/template
+{
+  "id":"actor_movie_template",
+  "params": {
+    "actor":"Brando"
+  }
+}
+
+GET movies/_search/template
+{
+  "id":"actor_movie_template",
+  "params": {
+    "actor":"Brando"
+  }
+}
+
+#Search template example 2
+PUT _scripts/actor_director_movie_template
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "query": {
+        "bool": {
+          "must": [
+            {
+              "match": {
+                "director": "{{director}}"
+              }
+            },
+            {
+              "match": {
+                "actors": "{{actor}}"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+
+GET movies/_search/template
+{
+  "id": "actor_director_movie_template",
+  "params": {
+    "director":"Coppola",
+    "actor":"Brando"
+  }
+}
+
+GET movies/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "director": "Coppola"
+          }
+        },
+        {
+          "match": {
+            "actors": "Brando"
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Searching multiple indices
+GET _search
+{
+  "query": {
+    "match": {
+      "actors": "Pacino"
+    }
+  }
+}
+
+GET _all/_search
+{
+  "query": {
+    "match": {
+      "actors": "Pacino"
+    }
+  }
+}
+
+GET */_search
+{
+  "query": {
+    "match": {
+      "actors": "Pacino"
+    }
+  }
+}
+
+DELETE movies_new
+DELETE movies_top
+PUT movies_top/_doc/1
+{
+  "title": "The Shawshank Redemption",
+  "synopsis": "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
+  "actors": [
+    "Tim Robbins",
+    "Morgan Freeman",
+    "Bob Gunton",
+    "William Sadler"
+  ],
+  "director": " Frank Darabont ",
+  "rating": "9.3",
+  "certificate": "R",
+  "genre": "Drama "
+}
+
+GET movies*/_search
+{
+  "query": {
+    "match": {
+      "title": "Redemption"
+    }
+  }
+}
+
+GET movies_new/_mapping
+GET movies*/_search
+{
+  "indices_boost": [
+    { "movies": 0.1},
+    { "movies_new": 0},
+    { "movies_top": 2.0}
+  ], 
+  "query": {
+    "match": {
+      "title": "Redemption"
+    }
+  }
+}
+
+#Query and filter context:
+# Query without scoring - query context by default
+GET movies/_search
+{
+  "query": {
+    "match": {
+      "title": "Godfather"
+    }
+  }
+}
+
+# Filter context - no score returned
+GET movies/_search
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "match": {
+            "title": "Godfather"
+          }
+        }
+      ]
+    }
+  }
+}
+#Another way to set the filter context
+GET movies/_search
+{
+  "query": {
+    "constant_score": {
+      "filter": {
+        "match": {
+          "title": "Godfather"
+        }
+      }
+    }
+  }
+}
+
+
+
+GET movies/_search
+{
+  "query": {
+    "bool": {
+      "must_not": [
+        {
+          "match": {
+            "title": "Godfather"
+          }
+        }
+      ]
+    }
+  }
+}
+
+
+
+
