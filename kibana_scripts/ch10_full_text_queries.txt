@@ -1,7 +1,7 @@
-#Full-text queries
-## BULK import books
-## Copy the [books.txt](https://github.com/madhusudhankonda/elasticsearch-in-action/blob/5592121e0cc159bd495e5bc2888f65ac6f95f699/datasets/books.txt) file into Kibana's DevTools and execute the bulk update
-GET books/_mapping
+# Full-text queries
+# BULK import books
+## Copy the datasets/books.txt file into Kibana's DevTools and execute the bulk update
+
 # Match queries
 
 ##Match all query
