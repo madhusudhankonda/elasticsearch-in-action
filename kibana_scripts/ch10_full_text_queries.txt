@@ -1,1 +1,473 @@
 #Full-text queries
+## BULK import books
+## Copy the [https://github.com/madhusudhankonda/elasticsearch-in-action/blob/5592121e0cc159bd495e5bc2888f65ac6f95f699/datasets/books.txt](books.txt) file into Kibana's DevTools and execute the bulk update
+GET books/_mapping
+# Match queries
+
+##Match all query
+GET books/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+GET books/_search
+{
+  "query": {
+    "match": {
+      "author": "Cay"
+    }
+  }
+}
+
+# Match query searching Java titles
+GET books/_search
+{
+  "query": {
+    "match": {
+      "title": "Java"
+    }
+  }
+}
+
+# Match query searching for a set of words (like a sentence)
+GET books/_search
+{
+  "query": {
+    "match": {
+      "title": {
+        "query": "Java Complete Guide"
+      }
+    }
+  },
+  "highlight": {
+    "fields": {
+      "title": {}
+    }
+  }
+}
+
+# Same as above query but specifying OR operator explicitly
+GET books/_search
+{
+  "query": {
+    "match": {
+      "title": {
+        "query": "Java Complete Guide",
+        "operator": "OR"
+      }
+    }
+  }
+}
+
+# Specifying AND operator explicitly
+GET books/_search
+{
+  "query": {
+    "match": {
+      "title": {
+        "query": "Java Complete Guide",
+        "operator": "AND"
+      }
+    }
+  }
+}
+
+# Matching at least two words 
+GET books/_search
+{
+  "query": {
+    "match": {
+      "title": {
+        "query": "Java Complete Guide",
+        "operator": "OR",
+        "minimum_should_match": 2
+      }
+    }
+  }
+}
+
+# Matching on an incorrect title (spelling mistake) - no results
+GET books/_search
+{
+  "query": {
+    "match": {
+      "title": {
+        "query": "Kava"
+      }
+    }
+  }
+}
+
+# Matching on an incorrect title (spelling mistake) - with fuzziness- postive results
+GET books/_search
+{
+  "query": {
+    "match": {
+      "title": {
+        "query": "Kava",
+        "fuzziness": 1
+      }
+    }
+  }
+}
+
+# Match phrase query
+GET books/_search
+{
+  "query": {
+    "match_phrase": {
+      "synopsis": "book for every Java programmer"
+    }
+  }
+}
+
+# Match phrase query with slop - missing one word
+GET books/_search
+{
+  "query": {
+    "match_phrase": {
+      "synopsis": {
+       "query": "book every Java programmer",
+       "slop": 1
+      }
+    }
+  }
+}
+
+# Match phrase query with jumbled up words will not work - even with slop
+GET books/_search
+{
+  "query": {
+    "match_phrase": {
+      "synopsis": {
+       "query": "for every Java programmer book",
+       "slop": 1
+      }
+    }
+  }
+}
+
+##Match all query with a pre-defined score
+GET books/_search
+{
+  "query": {
+    "match_all": {
+      "boost": 2
+    }
+  }
+}
+
+# Match phrase prefix 
+GET books/_search
+{
+  "query": {
+    "match_phrase_prefix": {
+      "tags": {
+        "query": "concepts and found"
+      }
+    }
+  },
+  "highlight": {
+    "fields": {
+      "tags": {}
+    }
+  }
+}
+# Match phrase prefix with slop - omitting "and"
+GET books/_search
+{
+  "query": {
+    "match_phrase_prefix": {
+      "tags": {
+        "query": "concepts found",
+        "slop":1
+      }
+    }
+  }
+}
+
+# Multi-match query
+GET books/_search
+{
+  "_source": false, 
+  "query": {
+    "multi_match": {
+      "query": "Java",
+      "fields": [
+        "title",
+        "synopsis",
+        "tags"
+      ]
+    }
+  },
+  "highlight": {
+    "fields": {
+      "title": {},
+      "tags": {}
+    }
+  }
+}
+
+# Best fields
+GET books/_search
+{
+  "_source": false, 
+  "query": {
+    "multi_match": {
+      "query": "Design Patterns",
+      "type": "best_fields", 
+      "fields": ["title","synopsis"]
+    }
+  }, "highlight": {
+    "fields": {
+      "tags": {},
+      "title": {}
+    }
+  }
+}
+
+# Best fields - with a tie breaker
+GET books/_search
+{
+  "_source": false, 
+  "query": {
+    "multi_match": {
+      "query": "Design Patterns",
+      "type": "best_fields", 
+      "fields": ["title","synopsis"],
+      "tie_breaker": 0.5
+    }
+  }, "highlight": {
+    "fields": {
+      "tags": {},
+      "title": {}
+    }
+  }
+}
+# 6.9938974 + 0.5 *(2.9220228 2.7801032 2.6008778)
+
+# dis_max query
+GET books/_search
+{
+  "_source": false, 
+  "query": {
+    "dis_max": {
+      "queries": [
+        {"match": {"title": "Design Patterns"}},
+        {"match": {"synopsis": "Design Patterns"}}]
+    }
+  }
+}
+
+# dis_max query
+GET books/_search
+{
+  "_source": false, 
+  "query": {
+    "dis_max": {
+      "queries": [
+        {"match": {"title": "Design Patterns"}},
+        {"match": {"synopsis": "Design Patterns"}}],
+        "tie_breaker": 0.5
+    }
+  },
+  "highlight": {
+    "fields": {
+      "title": {},
+      "synopsis": {},
+      "tags": {}
+    }
+  }
+}
+
+# Boosting individual queries
+GET books/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "C# guide",
+      "fields": ["title^2", "tags"]
+    }
+  }
+}
+
+# Query string
+GET books/_search
+{
+  "query": {
+    "query_string": {
+      "query": "author:Bert AND edition:2 and release_date>=2000-01-01"
+    }
+  }
+}
+
+# Query string with a no field specified
+GET books/_search
+{
+  "query": {
+    "query_string": {
+      "query": "Patterns"
+    }
+  }, 
+  "highlight": {
+    "fields": {
+      "title": {},
+      "synopsis": {},
+      "tags": {}
+    }
+  }
+}
+
+# Query string across multiple fields
+GET books/_search
+{
+  "query": {
+    "query_string": {
+      "query": "Patterns",
+      "fields": ["title","synopsis","tags"]
+    }
+  }
+}
+
+# Query string with a default field
+GET books/_search
+{
+  "query": {
+    "query_string": {
+      "query": "Design Patterns",
+      "default_field": "title"
+    }
+  }
+}
+
+# Query string with an AND operator
+GET books/_search
+{
+  "query": {
+    "query_string": {
+      "query": "Design Patterns",
+      "default_field": "title",
+      "default_operator": "AND"
+    }
+  }
+}
+
+# Query string with a phrase
+GET books/_search
+{
+  "query": {
+    "query_string": {
+      "query": "\"making the code better\"",
+      "default_field": "synopsis"
+    }
+  }
+}
+
+# Query string with a phrase and a slop
+GET books/_search
+{
+  "query": {
+    "query_string": {
+      "query": "\"making code better\"",
+      "default_field": "synopsis",
+      "phrase_slop": 1
+    }
+  }
+}
+
+# Query string with a fuzziness
+GET books/_search
+{
+  "query": {
+    "query_string": {
+      "query": "Pattenrs~",
+      "default_field": "title"
+    }
+  }
+}
+
+# Query string with a fuzziness with one edit distance
+GET books/_search
+{
+  "query": {
+    "query_string": {
+      "query": "Pattenrs~1",
+      "default_field": "title"
+    }
+  }
+}
+
+
+# Query string with a fuzziness with two corrections
+GET books/_search
+{
+  "query": {
+    "query_string": {
+      "query": "tterns~",
+      "default_field": "title"
+    }
+  }
+}
+
+# Illegal query
+GET books/_search
+{
+  "query": {
+    "query_string": {
+      "query": "title::Java "
+    }
+  }
+}
+
+# Illegal query
+GET books/_search
+{
+  "query": {
+    "query_string": {
+      "query": "title:Java\""
+    }
+  }
+}
+
+# Simple query string
+GET books/_search
+{
+  "query": {
+    "simple_query_string": {
+      "query": "Java + Cay"
+    }
+  }
+}
+
+# Simple query string - no issue with the incorrect syntax
+GET books/_search
+{
+  "query": {
+    "simple_query_string": {
+      "query": "title:Java\""
+    }
+  }
+}
+
+# Combined fields
+GET books/_search
+{
+  "query": {
+    "simple_query_string":{
+      "query":"Java",
+      "fields":["title","synopsis"]
+    }
+  }
+}
+# Combined fields
+GET books/_search
+{
+  "query": {
+    "combined_fields":{
+      "query":"Java",
+      "fields":["title","synopsis"]
+    }
+  }
+}
