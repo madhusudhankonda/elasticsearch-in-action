@@ -12,3 +12,9 @@ Here's the TOC
 5. [Working with Documents](https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-5.-Document-Operations)
 6. [Indexing Operations](https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-6-Indexing-Operations)
 7. [Appendix A: Installing and configuring Elasticsearch and Kibana](https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Appendix-A:-Installation)
+
+## Disabling XPack Security for 8.x
+By default, 8.x version of Elasticsearch comes with security enabled. For simplicity and not getting the security in our way, we can disable the feature
+>>PLEASE do not do this in PRODUCTION
+Edit config/elasticsearch.yml to add the following property at the end of the file:
+```xpack.security.enabled: false```
