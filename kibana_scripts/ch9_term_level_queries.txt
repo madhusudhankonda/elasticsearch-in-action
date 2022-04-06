@@ -159,8 +159,82 @@ GET movies/_search
   }
 }
 
+# Change the max term count property
+PUT movies/_settings
+{
+  "index":{
+    "max_terms_count":10
+  }
+}
+
 # Terms lookup
-# TBD
+DELETE classic_movies
+
+PUT classic_movies
+{
+  "mappings": {
+    "properties": {
+      "title": {
+        "type": "text"
+      },
+      "director": {
+        "type": "keyword"
+      }
+    }
+  }
+}
+PUT classic_movies2
+{
+  "mappings": {
+    "properties": {
+      "title": {
+        "type": "text"
+      },
+      "director": {
+        "type": "keyword"
+      }
+    }
+  }
+}
+
+PUT classic_movies/_doc/1
+{
+  "title":"Jaws",
+  "director":"Steven Spielberg"
+}
+
+PUT classic_movies/_doc/2
+{
+  "title":"Jaws II",
+  "director":"Jeannot Szwarc"
+}
+
+PUT classic_movies/_doc/3
+{
+  "title":"Ready Player One",
+  "director":"Steven Spielberg"
+}
+
+PUT classic_movies2/_doc/4
+{
+  "title":"Schindler's List",
+  "director":"Steven Spielberg"
+}
+
+
+GET classic_movies/_search
+{
+  "query": {
+    "terms": {
+      "director": {
+        "index":"classic_movies2",
+        "id":"4",
+        "path":"director"
+      }
+    }
+  }
+}
+
 
 # IDs query
 GET movies/_search
