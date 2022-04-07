@@ -446,7 +446,7 @@ GET movies/_search
 }
 
 #Index prefixes
-PUT classic_movies
+PUT boxoffice_hit_movies
 {
   "mappings": {
     "properties": {
@@ -458,12 +458,12 @@ PUT classic_movies
   }
 }
 
-PUT classic_movies/_doc/1
+PUT boxoffice_hit_movies/_doc/1
 {
   "title":"Gladiator"
 }
 
-GET classic_movies/_search
+GET boxoffice_hit_movies/_search
 {
   "query": {
     "prefix": {
@@ -475,15 +475,15 @@ GET classic_movies/_search
 }
 
 #Index prefixes with custom prefix settings
-PUT classic_movies2
+PUT boxoffice_hit_movies_custom_prefix_sizes
 {
   "mappings": {
     "properties": {
       "title":{
         "type": "text",
         "index_prefixes":{
-          "min_chars":4,
-          "max_chars":10
+          "min_chars":4, 
+          "max_chars":10 
         }
       }
     }
