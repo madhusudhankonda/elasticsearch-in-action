@@ -1,3 +1,157 @@
 # Advanced Search
 
 ## Compound Queries
+# Advanced search: compound queries
+
+# Create products schema
+
+# Index products using bulk API
+
+# Searching for TVs using bool query
+GET products/_search
+{
+  "query": {
+    "bool": { 
+      "must": [ 
+        {
+          "match": { 
+            "product": "TV"
+          }
+        }
+      ]
+    }
+  }
+}
+
+# TVs in a price range
+GET products/_search
+{
+  "query": {
+    "bool": {
+      "must": [ 
+        {
+          "match": { 
+            "product": "TV"
+          }
+        },
+        {
+          "range": { 
+            "price": {
+              "gte": 700,
+              "lte": 800
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+
+# TVs in a price range with a particular colour
+GET products/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "product": "TV"
+          }
+        },
+        {
+          "range": {
+            "price": {
+              "gte": 1000,
+              "lte": 2000
+            }
+          }
+        }, 
+        {
+          "terms": {
+            "colour": [
+              "silver",
+              "black"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
+
+# TVs in a 4k resolution range with a particular colour
+GET products/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "product": "TV"
+          }
+        },
+        {
+          "term": {
+            "resolution": "4k"
+          }
+        }, 
+        {
+          "terms": {
+            "colour": [
+              "silver",
+              "black"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
+
+## Searching for all TVs but not of specified brands
+GET products/_search
+{
+ "query": {
+   "bool": {
+     "must_not": [
+       {
+         "terms": {
+           "brand.keyword": [
+             "Samsung",
+             "Philips"
+           ]
+         }
+       }
+     ]
+   }
+ }
+}
+
+# 
+GET products/_search
+{
+ "query": {
+   "bool": {
+     "must_not": [
+       {
+         "terms": {
+           "brand.keyword": [
+             "Philips",
+             "Sony",
+             "Samsung",
+             "Panasonic"
+           ]
+         }
+       }
+     ],
+     "must": [
+       {
+         "match": {
+           "product": "TV"
+         }
+       }
+     ]
+   }
+ }
+}
