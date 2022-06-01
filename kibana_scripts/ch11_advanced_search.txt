@@ -1,11 +1,105 @@
-# Advanced Search
-
 ## Compound Queries
-# Advanced search: compound queries
 
 # Create products schema
 
 # Index products using bulk API
+
+# Advanced search: compound queries
+
+# Create products schema
+PUT products
+{
+  "mappings": {
+    "properties": {
+      "brand": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "colour": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "energy_rating": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "images": {
+        "type": "text"
+      },
+      "model": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "overview": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "price": {
+        "type": "double"
+      },
+      "product": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "resolution": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "size": {
+        "type": "text"
+      },
+      "type": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "user_ratings": {
+        "type": "double"
+      }
+    }
+  }
+}
+# Index products using bulk API
+
 
 # Searching for TVs using bool query
 GET products/_search
@@ -128,7 +222,7 @@ GET products/_search
  }
 }
 
-# 
+# Fetching only TVs for specifying the brand using must_not query clause
 GET products/_search
 {
  "query": {
@@ -138,9 +232,7 @@ GET products/_search
          "terms": {
            "brand.keyword": [
              "Philips",
-             "Sony",
-             "Samsung",
-             "Panasonic"
+             "Samsung"
            ]
          }
        }
@@ -155,3 +247,479 @@ GET products/_search
    }
  }
 }
+
+# Enhancing the must_not queries
+GET products/_search
+{
+ "query": {
+   "bool": {
+     "must_not": [
+       {
+         "terms": {
+           "brand.keyword": [
+             "Philips",
+             "Samsung"
+           ]
+         }
+       },
+       {
+         "range": {
+           "user_ratings": {
+             "lte": 4.0
+           }
+         }
+       },
+       {
+         "match": {
+           "colour": "black"
+         }
+       }
+     ],
+     "must": [
+       {
+         "match": {
+           "product": "TV"
+         }
+       },
+       {
+         "term": {
+           "resolution": {
+             "value": "4k"
+           }
+         }
+       },
+       {
+         "range": {
+           "price": {
+             "gte": 500,
+             "lte": 700
+           }
+         }
+       }
+     ]
+   }
+ }
+}
+
+## Should clause
+
+# This will fetch eihter brand matching "LG" or product "TV"
+GET products/_search
+{
+  "_source": ["product","brand", "overview","price"], 
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "range": {
+            "price": {
+              "gte": 500,
+              "lte": 1000
+            }
+          }
+        },
+        {
+          "match_phrase_prefix": {
+            "overview": "4k ultra hd"
+          }
+        }
+      ]
+    }
+  }
+}
+
+# This will fetch LG TVs using a must query - note the score
+GET products/_search
+{
+  "_source": ["product","brand"], 
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "product": "TV"
+          }
+        },
+        {
+          "match": {
+            "brand": "LG"
+          }
+        }
+      ],
+      "should": [
+        {
+          "range": {
+            "price": {
+              "gte": 500,
+              "lte": 1000
+            }
+          }
+        },
+        {
+          "match_phrase_prefix": {
+            "overview": "4k ultra hd"
+          }
+        }
+      ]
+    }
+  }
+}
+
+
+# Adding should clause boosts the score 
+GET products/_search
+{
+  "_source": ["product","brand","overview", "price"], 
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "product": "TV"
+          }
+        },
+        {
+          "match": {
+            "brand": "LG"
+          }
+        }
+      ], 
+      "should": [
+        {
+          "range": {
+            "price": {
+              "gte": 500,
+              "lte": 1000
+            }
+          }
+        },
+        {
+          "match_phrase_prefix": {
+            "overview": "4k ultra hd"
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Adding should clause with minimu_should_match
+GET products/_search
+{ 
+  "_source": ["product","brand","overview", "price","colour"], 
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "product": "TV"
+          }
+        },
+        {
+          "match": {
+            "brand": "LG"
+          }
+        }
+      ], 
+      "should": [
+        {
+          "range": {
+            "price": {
+              "gte": 500,
+              "lte": 1000
+            }
+          }
+        },
+        {
+          "match": {
+            "colour": "silver"
+          }
+        },
+        {
+          "match_phrase_prefix": {
+            "overview": "4kk"
+          }
+        }
+      ],
+      "minimum_should_match": 1
+    }
+  }
+}
+
+# Filter clause
+GET products/_search
+{
+  "_source": ["brand","product","colour"], 
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "product.keyword": "TV"
+          }
+        },
+        {
+          "range": {
+            "price": {
+              "gte": 500,
+              "lte": 1000
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Filter clause with must
+GET products/_search
+{
+  "_source": ["brand","product","colour","price"], 
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "brand": "LG"
+          }
+        }
+      ], 
+      "filter": [
+        {
+          "range": {
+            "price": {
+              "gte": 500,
+              "lte": 1000
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+#All clauses combined
+GET products/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "brand": "LG"
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "term": {
+            "colour": "silver"
+          }
+        }
+      ],
+      "should": [
+        {
+          "match": {
+            "energy_rating": "A++"
+          }
+        },
+        {
+          "term": {
+            "type": "Fridge Freezer"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "price": {
+              "gte": 500,
+              "lte": 1000
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+
+#Named queries for "All clauses combined" query
+GET products/_search
+{
+  "_source": ["product", "brand"], 
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "brand": {
+              "query": "LG",
+              "_name": "must_match_brand_query"
+            }
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "match": {
+            "colour.keyword": {
+              "query":"black",
+              "_name":"must_not_colour_query"
+            }
+          }
+        }
+      ],
+      "should": [
+        {
+          "term": {
+            "type.keyword": {
+              "value": "Frost Free Fridge Freezer",
+              "_name":"should_term_type_query"
+            }
+          }
+        },
+        {
+          "match": {
+            "energy_rating": {
+              "query": "A++",
+              "_name":"should_match_energy_rating_query"
+            }
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "price": {
+              "gte": 500,
+              "lte": 1000,
+              "_name":"filter_range_price_query"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+#Constant score
+GET products/_search
+{
+  "query": {
+    "constant_score": {
+      "filter": {
+        "range": {
+          "price": {
+            "gte": 1000,
+            "lte": 2000
+          }
+        }
+      },
+      "boost": 5.0
+    }
+  }
+}
+
+# Filter query
+GET products/_search
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "range": {
+            "user_ratings": {
+              "gte": 4,
+              "lte": 5
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Filter query 
+GET products/_search
+{
+  "query": {
+    "constant_score": {
+      "filter": 
+        {
+          "range": {
+            "user_ratings": {
+              "gte": 4,
+              "lte": 5
+            }
+          }
+        },
+      "boost": 5.0
+    }
+  }
+}
+
+# Bool query with a constant score
+GET products/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "product": "TV"
+          }
+        },
+        {
+          "constant_score": {
+            "filter": {
+              "term": {
+                "colour": "black"
+              }
+            },
+            "boost": 3.5
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Bool query with a constant score
+GET products/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "product": "TV"
+          }
+        }
+      ],
+      "should": [
+        {
+          "term": {
+            "brand.keyword": {
+              "value": "Samsung"
+            }
+          }
+        },
+        {
+          "constant_score": {
+            "filter": {
+              "range": {
+                "user_ratings": {
+                  "gte": 4,
+                  "lte": 5
+                }
+              }
+            },
+            "boost": 2.5
+          }
+        }
+      ], "minimum_should_match": 1
+    }
+  }
+}
+
