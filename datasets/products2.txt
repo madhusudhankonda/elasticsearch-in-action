@@ -1,0 +1,7 @@
+PUT _bulk
+{"index":{"_index":"products2","_id":"1"}}
+{"product": "TV", "brand": "Samsung", "model": "UE75TU7020", "size": "75", "resolution": "4k", "type": "smart tv", "price": 799, "colour": "silver", "energy_rating": "A+", "overview": "Amazing 75-inch Samsung smart TV. The incredibly sharp 4K Ultra HD display shows off everything in breathtaking quality, with bright, lifelike colours truly immersing you in the action.","tech_spec":"smart tv;4k ultra hd;2 years warranty", "user_ratings": 4.5, "images": ""}
+{"index":{"_index":"products2","_id":"2"}}
+{"product": "TV", "brand": "Samsung", "model": "QE65Q700TA", "size": "65", "resolution": "8k", "type": "QLED", "price": 1799, "colour": "black", "energy_rating": "A+", "overview": "This outstanding 65-inch Samsung TV turns your living room into a home cinema with truly amazing tech. Its 8K QLED screen gives you an incredible razor-sharp picture bursting with ultra-realistic detail and bright, true-to-life colours.Of course, it's a smart TV too,", "tech_spec":"smart tv;8k QLED GD;3 years warranty", "user_ratings": 5, "images": ""}
+{"index":{"_index":"products2","_id":"3"}}
+{"product": "TV", "brand": "Sony", "model": "KD65AG8BU", "size": "65", "resolution": "4k", "type": "OLED", "price": 1699, "colour": "black", "energy_rating": "A+", "overview": "Bring the cinema into your home with this 65-inch Sony Bravia OLED TV. Images are upscaled for truer 4K HDR quality. OLED technology provides genuine black and sharp contrast", "tech_spec":"smart tv;OLED hd;5 years warranty", "user_ratings": 4.8, "images": ""}
