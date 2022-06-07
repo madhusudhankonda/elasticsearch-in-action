@@ -334,7 +334,7 @@ GET movies/_search
   ]
 }
 
-# Range query with date match
+# Range query with date math
 GET movies/_search
 {
   "query": {
