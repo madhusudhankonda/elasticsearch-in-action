@@ -1,0 +1,3 @@
+PUT _bulk
+{"index":{"_index":"restaurants","_id":"1"}}
+{}
