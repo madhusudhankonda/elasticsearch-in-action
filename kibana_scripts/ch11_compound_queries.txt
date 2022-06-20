@@ -723,3 +723,376 @@ GET products/_search
   }
 }
 
+# Boosting query
+GET products/_search
+{
+  "size": 40, 
+  "_source": ["product", "price","colour"], 
+  "query": {
+    "boosting": {
+      "positive": {
+        "term": {
+          "product":"tv"
+        }
+      },
+      "negative": {
+        "range": {
+          "price": {
+            "gte": 2500
+          }
+        }
+      },
+      "negative_boost": 0.5
+    }
+  }
+}
+
+# Boosting query combined with bool queries
+GET products/_search
+{
+  "size": 40, 
+  "_source": ["product", "price","colour","brand"], 
+  "query": {
+    "boosting": {
+      "positive": {
+        "bool": {
+          "must": [
+            {
+              "match": {
+                "product": "TV"
+              }
+            }
+          ]
+        }
+      },
+      "negative": {
+        "bool": {
+          "must": [
+            {
+              "match": {
+                "brand": "Sony"
+              }
+            }
+          ]
+        }
+      },
+      "negative_boost": 0.5
+    }
+  }
+}
+
+# Multi_match
+GET products/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "smart",
+      "fields": ["type","overview"]
+    }
+  }, "highlight": {
+    "fields": {
+      "type": {},
+      "overview": {}
+    }
+  }
+}
+
+GET products/_search
+{
+  "_source": ["type","overview"], 
+  "query": {
+    "dis_max": {
+      "queries": [{
+        "match": {
+          "type": "smart tv"
+        }
+      },
+      {
+        "match": {
+          "overview": "smart tv"
+        }
+      },
+      {
+        "match": {
+          "product": "smart tv"
+        }
+      }],"tie_breaker": 0.5  
+    }
+  }
+}
+
+# Disjunction Maximum (dis-max)
+GET products2/_search
+{
+  "_source": ["type","overview","tech_spec"], 
+  "query": {
+    "dis_max": {
+      "queries": [{
+        "match": {
+          "type": "smart tv"
+        }
+      },
+      {
+        "match": {
+          "overview": "smart tv"
+        }
+      },
+      {
+        "match": {
+          "tech_spec": "smart tv"
+        }
+      }]  
+    }
+  },"highlight": {
+    "fields": {
+      "tech_spec": {},
+      "overview": {},
+      "type": {}
+    }
+  }
+}
+
+# Term search with a bog-standard term query - see the score:1.6376086
+GET products/_search
+{
+  "query": {
+    "term": {
+      "product": {
+        "value": "tv"
+      }
+    }
+  }
+}
+
+#Function score - wraping the term query - score is 1.6376086
+
+GET products/_search
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "term": {
+          "product": "tv"
+        }
+      }
+    }
+  }
+}
+
+#Function score - random score
+GET products/_search
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "term": {
+          "product": "tv"
+        }
+       },
+       "random_score": {}
+    }
+  }
+}
+
+
+#Function score - random score boosted by a factor
+GET products/_search
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "term": {
+          "product": "tv"
+        }
+      },
+      "random_score": {},
+      "boost": 3
+    }
+  }
+}
+
+#Function score - random score - with seed and field
+GET products/_search
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "term": {
+          "product": "tv"
+        }
+       },
+       "random_score": {
+         "seed": 10,
+         "field":"user_ratings"
+       }
+    }
+  }
+}
+
+#Function score - random score boosted by a factor
+GET products/_search
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "term": {
+          "product": "tv"
+        }
+      },
+      "random_score": {},
+      "boost": 3
+    }
+  }
+}
+
+#Function score - scripted score based on user_ratings value
+GET products/_search
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "term": {
+          "product": "tv"
+        }
+      },
+      "script_score": {
+        "script": {
+          "source":"_score * doc['user_ratings'].value + params['goodluck_factor']",
+          "params": {
+            "goodluck_factor":10
+          }
+        }
+      }
+    }
+  }
+}
+
+# Using script_score function to define a scoring function
+GET products/_search
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "term": {
+          "product": "tv"
+        }
+      },
+      "script_score": {
+        "script": {
+          "source":"_score * doc['user_ratings'].value * params['factor']",
+          "params": {
+            "factor":3
+          }
+        }
+      }
+    }
+  }
+}
+
+#Field value factor
+GET products/_search
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "term": {
+          "product": "tv"
+        }
+      },
+      "field_value_factor": {
+        "field": "user_ratings",
+        "factor": 2,
+        "modifier": "square"
+      }
+    }
+  }
+}
+
+# Multiple functions made up of weight and field value factor functions
+GET products/_search
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "term": {
+          "product": "tv"
+        }
+      },
+      "functions": [
+        {
+          "filter": {
+            "term": {
+              "brand": "LG"
+            }
+          },
+          "weight": 3
+        },
+        {
+          "filter": {
+            "range": {
+              "user_ratings": {
+                "gte": 4.5,
+                "lte": 5
+              }
+            }
+          }, 
+          "field_value_factor": {
+            "field": "user_ratings", 
+            "factor": 1.2,
+            "modifier": "square"
+          }
+        }
+      ],
+      "score_mode": "avg",
+      "boost_mode": "sum"
+    }
+  }
+}
+# Multiple functions - random score, weight and field value factor
+GET products/_search
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "term": {
+          "product": "tv"
+        }
+      },
+      "functions": [
+        {
+          "filter": {
+            "match": {
+              "brand": "samsung"
+            }
+          },
+          "random_score": {}
+        },
+        {
+          "filter": {
+            "match_phrase": {
+              "overview": "4K ultra hd"
+            }
+          },
+          "weight": 2
+        },
+        {
+          "filter": {
+            "range": {
+              "user_ratings": {
+                "gte": 4.5,
+                "lte": 5
+              }
+            }
+          },
+          "field_value_factor": {
+            "field": "user_ratings",
+            "factor": 2,
+            "modifier": "square"
+          }
+        }
+      ],
+      "score_mode": "avg",
+      "boost_mode": "multiply"
+    }
+  }
+}
