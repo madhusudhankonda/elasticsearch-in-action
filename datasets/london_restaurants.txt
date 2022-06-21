@@ -1,3 +1,6 @@
+# A big thanks to Shirang Dixit for his Kaggle's dataset: https://www.kaggle.com/datasets/shrirangdixit/restaurants-and-venues-in-london?resource=download&select=top_100.csv
+
+
 PUT _bulk
 {"index":{"_index":"restaurants","_id":"1"}}
 {"borough": "Barking and Dagenham", "name": "Costa Coffee", "town_center": "51.574780001107, 0.174409970722365", "location": "51.5768901505657, 0.179497329179776", "category": "Coffee Shop"}
