@@ -1,1 +1,63 @@
-## Ch12 Advanced Queries
+# Advanced search: compound queries
+
+# Create a mapping for restaurants
+DELETE restaurants
+PUT restaurants
+{
+  "mappings": {
+    "properties": {
+      "name":{
+        "type": "text"
+      },
+      "town_centre":{
+        "type": "geo_point"
+      },
+      "location":{
+        "type": "geo_point"
+      },
+      "category":{
+        "type":"text"
+      },
+      "hygenie_rating":{
+        "type": "short"
+      },
+      "borough":{
+        "type":"text"
+      }
+    }
+  }
+}
+
+## INDEX the restaurants dataset 
+# Copy the contents from https://github.com/madhusudhankonda/elasticsearch-in-action/blob/main/datasets/london_restaurants.txt to here and execute the bulk API call.
+
+
+# Geo bounding 
+GET restaurants/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        }
+      ], 
+    "filter":{
+      "geo_bounding_box": {
+        "location": {
+          "top_left": {
+            "lat": 52.00,
+            "lon": 0.20
+          },
+          "bottom_right": {
+            "lat": 49.00,
+            "lon": 0.10
+          }
+        }
+      }
+    }
+    }
+  }
+}
+
+
