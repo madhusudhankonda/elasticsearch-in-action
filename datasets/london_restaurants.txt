@@ -1,3 +1,201 @@
 PUT _bulk
 {"index":{"_index":"restaurants","_id":"1"}}
-{}
+{"borough": "Barking and Dagenham", "name": "Costa Coffee", "town_center": "51.574780001107, 0.174409970722365", "location": "51.5768901505657, 0.179497329179776", "category": "Coffee Shop"}
+{"index":{"_index":"restaurants","_id":"2"}}
+{"borough": "Barking and Dagenham", "name": "Ciao Bella", "town_center": "51.574780001107, 0.174409970722365", "location": "51.5761031644746, 0.182819451657697", "category": "Italian Restaurant"}
+{"index":{"_index":"restaurants","_id":"3"}}
+{"borough": "Barking and Dagenham", "name": "Costa Coffee", "town_center": "51.574780001107, 0.174409970722365", "location": "51.5764810641186, 0.182447859463851", "category": "Coffee Shop"}
+{"index":{"_index":"restaurants","_id":"4"}}
+{"borough": "Barking and Dagenham", "name": "Braza", "town_center": "51.574780001107, 0.174409970722365", "location": "51.5763438553126, 0.181760001988972", "category": "Brazilian Restaurant"}
+{"index":{"_index":"restaurants","_id":"5"}}
+{"borough": "Barking and Dagenham", "name": "The Bull", "town_center": "51.574780001107, 0.174409970722365", "location": "51.5795205127607, 0.182871095573334", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"6"}}
+{"borough": "Barking and Dagenham", "name": "Patisserie Valerie", "town_center": "51.574780001107, 0.174409970722365", "location": "51.5764467677515, 0.179965973726707", "category": "Cafe"}
+{"index":{"_index":"restaurants","_id":"7"}}
+{"borough": "Barking and Dagenham", "name": "Starbucks", "town_center": "51.574780001107, 0.174409970722365", "location": "51.576281, 0.181187", "category": "Coffee Shop"}
+{"index":{"_index":"restaurants","_id":"8"}}
+{"borough": "Barking and Dagenham", "name": "Teapot Cafe", "town_center": "51.574780001107, 0.174409970722365", "location": "51.579782, 0.182306", "category": "Cafe"}
+{"index":{"_index":"restaurants","_id":"9"}}
+{"borough": "Barking and Dagenham", "name": "Harris + Hoole", "town_center": "51.574780001107, 0.174409970722365", "location": "51.5656137812814, 0.191278187889649", "category": "Coffee Shop"}
+{"index":{"_index":"restaurants","_id":"10"}}
+{"borough": "Barking and Dagenham", "name": "Frankie & Benny's", "town_center": "51.574780001107, 0.174409970722365", "location": "51.5751804, 0.1801494", "category": "American Restaurant"}
+{"index":{"_index":"restaurants","_id":"11"}}
+{"borough": "Barnet", "name": "The King's Arms", "town_center": "51.527094989936, -0.0668257039632054", "location": "51.525753907299, -0.0658676349732126", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"12"}}
+{"borough": "Barnet", "name": "Sam's Cafe", "town_center": "51.527094989936, -0.0668257039632054", "location": "51.5264242861641, -0.0650555900273512", "category": "Cafe"}
+{"index":{"_index":"restaurants","_id":"13"}}
+{"borough": "Barnet", "name": "Brawn", "town_center": "51.527094989936, -0.0668257039632054", "location": "51.5289129240344, -0.0703129817333181", "category": "Restaurant"}
+{"index":{"_index":"restaurants","_id":"14"}}
+{"borough": "Barnet", "name": "Tas Firin", "town_center": "51.527094989936, -0.0668257039632054", "location": "51.5254584974656, -0.0702727253628311", "category": "Turkish Restaurant"}
+{"index":{"_index":"restaurants","_id":"15"}}
+{"borough": "Barnet", "name": "E Pellicci", "town_center": "51.527094989936, -0.0668257039632054", "location": "51.526516, -0.063426", "category": "Cafe"}
+{"index":{"_index":"restaurants","_id":"16"}}
+{"borough": "Barnet", "name": "Holy Shot", "town_center": "51.527094989936, -0.0668257039632054", "location": "51.5254297867875, -0.0704955175906381", "category": "Coffee Shop"}
+{"index":{"_index":"restaurants","_id":"17"}}
+{"borough": "Barnet", "name": "Well & Bucket", "town_center": "51.527094989936, -0.0668257039632054", "location": "51.5252935552737, -0.0709888374442932", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"18"}}
+{"borough": "Barnet", "name": "Jonestown", "town_center": "51.527094989936, -0.0668257039632054", "location": "51.5260919169767, -0.0679361253278925", "category": "Coffee Shop"}
+{"index":{"_index":"restaurants","_id":"19"}}
+{"borough": "Barnet", "name": "Beigel Bake", "town_center": "51.527094989936, -0.0668257039632054", "location": "51.5245132556491, -0.0716434492960825", "category": "Bagel Shop"}
+{"index":{"_index":"restaurants","_id":"20"}}
+{"borough": "Barnet", "name": "The Carpenters Arms", "town_center": "51.527094989936, -0.0668257039632054", "location": "51.523927250026, -0.0674413496578882", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"21"}}
+{"borough": "Bexley", "name": "The Lale Restaurant", "town_center": "51.4520777153566, 0.0699310359401914", "location": "51.4509414781371, 0.0514545861448455", "category": "Fast Food Restaurant"}
+{"index":{"_index":"restaurants","_id":"22"}}
+{"borough": "Bexley", "name": "Nando's", "town_center": "51.4520777153566, 0.0699310359401914", "location": "51.45054026, 0.05653644", "category": "Portuguese Restaurant"}
+{"index":{"_index":"restaurants","_id":"23"}}
+{"borough": "Bexley", "name": "Rixos", "town_center": "51.4520777153566, 0.0699310359401914", "location": "51.450678, 0.057724", "category": "Mediterranean Restaurant"}
+{"index":{"_index":"restaurants","_id":"24"}}
+{"borough": "Bexley", "name": "Costa Coffee", "town_center": "51.4520777153566, 0.0699310359401914", "location": "51.451008251248, 0.0541388278388066", "category": "Coffee Shop"}
+{"index":{"_index":"restaurants","_id":"25"}}
+{"borough": "Bexley", "name": "Eltham GPO", "town_center": "51.4520777153566, 0.0699310359401914", "location": "51.4503454752311, 0.0540715508832256", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"26"}}
+{"borough": "Bexley", "name": "The Park Tavern", "town_center": "51.4520777153566, 0.0699310359401914", "location": "51.4498344269546, 0.0543999993955841", "category": "Bar"}
+{"index":{"_index":"restaurants","_id":"27"}}
+{"borough": "Bexley", "name": "Oxleas Wood Cafe", "town_center": "51.4520777153566, 0.0699310359401914", "location": "51.4665009464818, 0.0697064082304458", "category": "Cafe"}
+{"index":{"_index":"restaurants","_id":"28"}}
+{"borough": "Bexley", "name": "Rising Sun", "town_center": "51.4520777153566, 0.0699310359401914", "location": "51.4507943380767, 0.0585335705495846", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"29"}}
+{"borough": "Bexley", "name": "Greggs", "town_center": "51.4520777153566, 0.0699310359401914", "location": "51.4509658813476, 0.0562703981995582", "category": "Bakery"}
+{"index":{"_index":"restaurants","_id":"30"}}
+{"borough": "Bexley", "name": "Ziyafet", "town_center": "51.4520777153566, 0.0699310359401914", "location": "51.4507589986404, 0.0579818639303895", "category": "Mediterranean Restaurant"}
+{"index":{"_index":"restaurants","_id":"31"}}
+{"borough": "Brent", "name": "Vero Caffe", "town_center": "51.6097831150824, -0.194672008019029", "location": "51.6151121664419, -0.190732068656857", "category": "Cafe"}
+{"index":{"_index":"restaurants","_id":"32"}}
+{"borough": "Brent", "name": "Michaels", "town_center": "51.6097831150824, -0.194672008019029", "location": "51.6151839858547, -0.190852863254336", "category": "Cafe"}
+{"index":{"_index":"restaurants","_id":"33"}}
+{"borough": "Brent", "name": "Divans", "town_center": "51.6097831150824, -0.194672008019029", "location": "51.6054713446698, -0.18784697192525", "category": "Turkish Restaurant"}
+{"index":{"_index":"restaurants","_id":"34"}}
+{"borough": "Brent", "name": "Tintico", "town_center": "51.6097831150824, -0.194672008019029", "location": "51.601117071909, -0.193745059397798", "category": "Coffee Shop"}
+{"index":{"_index":"restaurants","_id":"35"}}
+{"borough": "Brent", "name": "Ishtah Restaurant", "town_center": "51.6097831150824, -0.194672008019029", "location": "51.6000001468419, -0.19599437713623", "category": "Turkish Restaurant"}
+{"index":{"_index":"restaurants","_id":"36"}}
+{"borough": "Brent", "name": "Beheshte Barin", "town_center": "51.6097831150824, -0.194672008019029", "location": "51.6044408380993, -0.18901225817288", "category": "Persian Restaurant"}
+{"index":{"_index":"restaurants","_id":"37"}}
+{"borough": "Brent", "name": "Bohemia Bar", "town_center": "51.6097831150824, -0.194672008019029", "location": "51.6153029887064, -0.176606810713685", "category": "Bar"}
+{"index":{"_index":"restaurants","_id":"38"}}
+{"borough": "Brent", "name": "Boulangerie Joie De Vie", "town_center": "51.6097831150824, -0.194672008019029", "location": "51.6140791870559, -0.176805054900558", "category": "Breakfast Spot"}
+{"index":{"_index":"restaurants","_id":"39"}}
+{"borough": "Brent", "name": "JOE & THE JUICE", "town_center": "51.6097831150824, -0.194672008019029", "location": "51.6012515, -0.1937675", "category": "Juice Bar"}
+{"index":{"_index":"restaurants","_id":"40"}}
+{"borough": "Brent", "name": "Durum", "town_center": "51.6097831150824, -0.194672008019029", "location": "51.6046125660528, -0.188849152912733", "category": "Middle Eastern Restaurant"}
+{"index":{"_index":"restaurants","_id":"41"}}
+{"borough": "Bromley", "name": "K\u82d4y\u861dm", "town_center": "51.6015105745503, -0.0663650798170126", "location": "51.6039089201188, -0.0679442988499194", "category": "Mediterranean Restaurant"}
+{"index":{"_index":"restaurants","_id":"42"}}
+{"borough": "Bromley", "name": "San Marco", "town_center": "51.6015105745503, -0.0663650798170126", "location": "51.5942556990959, -0.0700769248332533", "category": "Italian Restaurant"}
+{"index":{"_index":"restaurants","_id":"43"}}
+{"borough": "Bromley", "name": "The Beehive", "town_center": "51.6015105745503, -0.0663650798170126", "location": "51.592203, -0.069205", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"44"}}
+{"borough": "Bromley", "name": "Pressure Drop Brewery & Taproom", "town_center": "51.6015105745503, -0.0663650798170126", "location": "51.5905977319284, -0.0579861082470803", "category": "Brewery"}
+{"index":{"_index":"restaurants","_id":"45"}}
+{"borough": "Bromley", "name": "Beavertown Brewery", "town_center": "51.6015105745503, -0.0663650798170126", "location": "51.5910143775121, -0.0567056428947125", "category": "Brewery"}
+{"index":{"_index":"restaurants","_id":"46"}}
+{"borough": "Bromley", "name": "The Bricklayers Arms", "town_center": "51.6015105745503, -0.0663650798170126", "location": "51.6058591330067, -0.0681968627826005", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"47"}}
+{"borough": "Bromley", "name": "The Antwerp Arms", "town_center": "51.6015105745503, -0.0663650798170126", "location": "51.6017749589411, -0.0747621657183833", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"48"}}
+{"borough": "Bromley", "name": "Styx Bar", "town_center": "51.6015105745503, -0.0663650798170126", "location": "51.5894618157794, -0.0611187776416513", "category": "Bar"}
+{"index":{"_index":"restaurants","_id":"49"}}
+{"borough": "Bromley", "name": "Bill Nicholson Pub", "town_center": "51.6015105745503, -0.0663650798170126", "location": "51.6057869950186, -0.0617015153439127", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"50"}}
+{"borough": "Bromley", "name": "The High Cross", "town_center": "51.6015105745503, -0.0663650798170126", "location": "51.589317, -0.070183", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"51"}}
+{"borough": "Camden", "name": "Granger & Co.", "town_center": "51.53236, -0.127959999999973", "location": "51.53260599028, -0.125274774925295", "category": "Breakfast Spot"}
+{"index":{"_index":"restaurants","_id":"52"}}
+{"borough": "Camden", "name": "The Coal Office", "town_center": "51.53236, -0.127959999999973", "location": "51.5350334053233, -0.126354341029567", "category": "Middle Eastern Restaurant"}
+{"index":{"_index":"restaurants","_id":"53"}}
+{"borough": "Camden", "name": "German Gymnasium", "town_center": "51.53236, -0.127959999999973", "location": "51.5323924057199, -0.125266572012957", "category": "Modern European Restaurant"}
+{"index":{"_index":"restaurants","_id":"54"}}
+{"borough": "Camden", "name": "Dishoom", "town_center": "51.53236, -0.127959999999973", "location": "51.5360803511111, -0.125733423886154", "category": "Indian Restaurant"}
+{"index":{"_index":"restaurants","_id":"55"}}
+{"borough": "Camden", "name": "Caravan King's Cross", "town_center": "51.53236, -0.127959999999973", "location": "51.5353309005303, -0.125238941536818", "category": "Breakfast Spot"}
+{"index":{"_index":"restaurants","_id":"56"}}
+{"borough": "Camden", "name": "Redemption Roasters", "town_center": "51.53236, -0.127959999999973", "location": "51.53578653699, -0.125830995565926", "category": "Coffee Shop"}
+{"index":{"_index":"restaurants","_id":"57"}}
+{"borough": "Camden", "name": "Spiritland King's Cross", "town_center": "51.53236, -0.127959999999973", "location": "51.5365880173102, -0.125647249431435", "category": "Bar"}
+{"index":{"_index":"restaurants","_id":"58"}}
+{"borough": "Camden", "name": "Barrafina", "town_center": "51.53236, -0.127959999999973", "location": "51.5359001107097, -0.127014241297244", "category": "Tapas Restaurant"}
+{"index":{"_index":"restaurants","_id":"59"}}
+{"borough": "Camden", "name": "Pizza Union", "town_center": "51.53236, -0.127959999999973", "location": "51.5309843732385, -0.119933337078844", "category": "Pizza Place"}
+{"index":{"_index":"restaurants","_id":"60"}}
+{"borough": "Camden", "name": "Aux Pains de Papy", "town_center": "51.53236, -0.127959999999973", "location": "51.52934, -0.12030311", "category": "Bakery"}
+{"index":{"_index":"restaurants","_id":"61"}}
+{"borough": "Croydon", "name": "Forks & Green", "town_center": "51.5934799851819, -0.0834199693442485", "location": "51.5864033288793, -0.0876568737106018", "category": "Coffee Shop"}
+{"index":{"_index":"restaurants","_id":"62"}}
+{"borough": "Croydon", "name": "San Marco", "town_center": "51.5934799851819, -0.0834199693442485", "location": "51.5942556990959, -0.0700769248332533", "category": "Italian Restaurant"}
+{"index":{"_index":"restaurants","_id":"63"}}
+{"borough": "Croydon", "name": "The Beehive", "town_center": "51.5934799851819, -0.0834199693442485", "location": "51.592203, -0.069205", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"64"}}
+{"borough": "Croydon", "name": "True Craft", "town_center": "51.5934799851819, -0.0834199693442485", "location": "51.5844548988647, -0.0759145443098913", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"65"}}
+{"borough": "Croydon", "name": "Big Bowl Noodle", "town_center": "51.5934799851819, -0.0834199693442485", "location": "51.5890428491221, -0.0798050088275486", "category": "Chinese Restaurant"}
+{"index":{"_index":"restaurants","_id":"66"}}
+{"borough": "Croydon", "name": "Blighty Tottenham", "town_center": "51.5934799851819, -0.0834199693442485", "location": "51.5857315913233, -0.071639098067246", "category": "Coffee Shop"}
+{"index":{"_index":"restaurants","_id":"67"}}
+{"borough": "Croydon", "name": "The High Cross", "town_center": "51.5934799851819, -0.0834199693442485", "location": "51.589317, -0.070183", "category": "Pub"}
+"index":{"_index":"restaurants","_id":"68"}}
+{"borough": "Croydon", "name": "Neighbours Fish Bar", "town_center": "51.5934799851819, -0.0834199693442485", "location": "51.5936938448642, -0.078361531163436", "category": "Fast Food Restaurant"}
+{"index":{"_index":"restaurants","_id":"69"}}
+{"borough": "Croydon", "name": "The Westbury", "town_center": "51.5934799851819, -0.0834199693442485", "location": "51.5934584725395, -0.0984119411285734", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"70"}}
+{"borough": "Croydon", "name": "Durak Tantuni", "town_center": "51.5934799851819, -0.0834199693442485", "location": "51.5863071648797, -0.0948641974566496", "category": "Turkish Restaurant"}
+{"index":{"_index":"restaurants","_id":"71"}}
+{"borough": "Ealing", "name": "WA Cafe", "town_center": "51.51406, -0.30072999999993", "location": "51.5159443047932, -0.302204197643989", "category": "Dessert Shop"}
+{"index":{"_index":"restaurants","_id":"72"}}
+{"borough": "Ealing", "name": "Electric Coffee Co.", "town_center": "51.51406, -0.30072999999993", "location": "51.5153911156112, -0.30229740345209", "category": "Coffee Shop"}
+{"index":{"_index":"restaurants","_id":"73"}}
+{"borough": "Ealing", "name": "Hare and Tortoise", "town_center": "51.51406, -0.30072999999993", "location": "51.515635, -0.302106", "category": "Noodle House"}
+{"index":{"_index":"restaurants","_id":"74"}}
+{"borough": "Ealing", "name": "The Drapers Arms", "town_center": "51.51406, -0.30072999999993", "location": "51.5116061052896, -0.305163115370252", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"75"}}
+{"borough": "Ealing", "name": "Pho", "town_center": "51.51406, -0.30072999999993", "location": "51.513200351339, -0.306250120386768", "category": "Vietnamese Restaurant"}
+{"index":{"_index":"restaurants","_id":"76"}}
+{"borough": "Ealing", "name": "Franco Manca", "town_center": "51.51406, -0.30072999999993", "location": "51.5129934137107, -0.306861265576397", "category": "Pizza Place"}
+{"index":{"_index":"restaurants","_id":"77"}}
+{"borough": "Ealing", "name": "Artisan Coffee", "town_center": "51.51406, -0.30072999999993", "location": "51.5130239121096, -0.306655060235716", "category": "Coffee Shop"}
+{"index":{"_index":"restaurants","_id":"78"}}
+{"borough": "Ealing", "name": "Bee Hive", "town_center": "51.51406, -0.30072999999993", "location": "51.5104353629262, -0.3054168881695", "category": "Cafe"}
+{"index":{"_index":"restaurants","_id":"79"}}
+{"borough": "Ealing", "name": "Turtle Bay", "town_center": "51.51406, -0.30072999999993", "location": "51.512064951366, -0.304737682171537", "category": "Caribbean Restaurant"}
+{"index":{"_index":"restaurants","_id":"80"}}
+{"borough": "Ealing", "name": "The Kings Arms", "town_center": "51.51406, -0.30072999999993", "location": "51.5109807572851, -0.302002674073637", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"81"}}
+{"borough": "Enfield", "name": "Toconoco", "town_center": "51.5400236215167, -0.0775021537472357", "location": "51.5383104191455, -0.0780980601377977", "category": "Udon Restaurant"}
+{"index":{"_index":"restaurants","_id":"82"}}
+{"borough": "Enfield", "name": "Chick 'n' Sours", "town_center": "51.5400236215167, -0.0775021537472357", "location": "51.5412919201058, -0.0763088119457662", "category": "Fried Chicken Joint"}
+{"index":{"_index":"restaurants","_id":"83"}}
+{"borough": "Enfield", "name": "Berber & Q", "town_center": "51.5400236215167, -0.0775021537472357", "location": "51.536882, -0.07581", "category": "Middle Eastern Restaurant"}
+{"index":{"_index":"restaurants","_id":"84"}}
+{"borough": "Enfield", "name": "Towpath Cafe", "town_center": "51.5400236215167, -0.0775021537472357", "location": "51.537169, -0.08118", "category": "Coffee Shop"}
+{"index":{"_index":"restaurants","_id":"85"}}
+{"borough": "Enfield", "name": "Arepa & Co", "town_center": "51.5400236215167, -0.0775021537472357", "location": "51.5370471235717, -0.0801467669382093", "category": "Arepa Restaurant"}
+{"index":{"_index":"restaurants","_id":"86"}}
+{"borough": "Enfield", "name": "The Scolt Head", "town_center": "51.5400236215167, -0.0775021537472357", "location": "51.5431308529259, -0.0815900760000717", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"87"}}
+{"borough": "Enfield", "name": "Madame Pigg", "town_center": "51.5400236215167, -0.0775021537472357", "location": "51.543389, -0.075859", "category": "Restaurant"}
+{"index":{"_index":"restaurants","_id":"88"}}
+{"borough": "Enfield", "name": "Andu's cafe", "town_center": "51.5400236215167, -0.0775021537472357", "location": "51.5445198364757, -0.0759062189011869", "category": "Ethiopian Restaurant"}
+{"index":{"_index":"restaurants","_id":"89"}}
+{"borough": "Enfield", "name": "Better Health Bakery", "town_center": "51.5400236215167, -0.0775021537472357", "location": "51.5373758194978, -0.0751918750572799", "category": "Bakery"}
+{"index":{"_index":"restaurants","_id":"90"}}
+{"borough": "Enfield", "name": "Signature Brew Taproom & Venue", "town_center": "51.5400236215167, -0.0775021537472357", "location": "51.536617, -0.07570233", "category": "Beer Bar"}
+{"index":{"_index":"restaurants","_id":"91"}}
+{"borough": "Greenwich", "name": "Cutty Sark Tavern", "town_center": "51.48454, 0.00275000000004865", "location": "51.4864158641669, -0.000485650977134305", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"92"}}
+{"borough": "Greenwich", "name": "Midpoint", "town_center": "51.48454, 0.00275000000004865", "location": "51.486043, -0.000911", "category": "Turkish Restaurant"}
+{"index":{"_index":"restaurants","_id":"93"}}
+{"borough": "Greenwich", "name": "Sefa", "town_center": "51.48454, 0.00275000000004865", "location": "51.4845238644171, 0.00253671792443989", "category": "Turkish Restaurant"}
+{"index":{"_index":"restaurants","_id":"94"}}
+{"borough": "Greenwich", "name": "Zaibatsu", "town_center": "51.48454, 0.00275000000004865", "location": "51.4840949352715, 0.00137609013534067", "category": "Japanese Restaurant"}
+{"index":{"_index":"restaurants","_id":"95"}}
+{"borough": "Greenwich", "name": "The Plume of Feathers", "town_center": "51.48454, 0.00275000000004865", "location": "51.4819450403517, -0.00112598463407319", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"96"}}
+{"borough": "Greenwich", "name": "Mountain View Greenwich", "town_center": "51.48454, 0.00275000000004865", "location": "51.484824, 0.003913", "category": "Indian Restaurant"}
+{"index":{"_index":"restaurants","_id":"97"}}
+{"borough": "Greenwich", "name": "Effes Meze", "town_center": "51.48454, 0.00275000000004865", "location": "51.4850160366829, 0.00420840980734031", "category": "Mediterranean Restaurant"}
+{"index":{"_index":"restaurants","_id":"98"}}
+{"borough": "Greenwich", "name": "Theatre of Wine", "town_center": "51.48454, 0.00275000000004865", "location": "51.4838404206285, 0.000603263673400172", "category": "Wine Shop"}
+{"index":{"_index":"restaurants","_id":"99"}}
+{"borough": "Greenwich", "name": "River Ale House", "town_center": "51.48454, 0.00275000000004865", "location": "51.4861666603242, 0.0133654475212097", "category": "Pub"}
+{"index":{"_index":"restaurants","_id":"100"}}
+{"borough": "Greenwich", "name": "Meantime Brewing Company", "town_center": "51.48454, 0.00275000000004865", "location": "51.4895678225253, 0.00857507908913158", "category": "Brewery"}
