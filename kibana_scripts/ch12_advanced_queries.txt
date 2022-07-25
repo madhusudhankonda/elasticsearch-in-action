@@ -1,7 +1,60 @@
 # Advanced search: compound queries
 
+# Creating mapping for bus_stops with geo_point type
+PUT bus_stops
+{
+  "mappings": {
+    "properties": {
+      "name":{
+        "type": "text"
+      },
+      "location":{
+        "type": "geo_point"
+      }
+    }
+  }
+}
+
+# As string (lat, lon)
+POST bus_stops/_doc
+{
+  "name":"London Bridge Station",
+  "location":"51.07, 0.08"
+}
+
+# As WKT point (lat, lon)
+POST bus_stops/_doc
+{
+  "text": "London Victoria Station",
+  "location" : "POINT (51.49 0.14)" 
+}
+
+# As WKT point
+POST bus_stops/_doc
+{
+  "text": "Leciester Square Station",
+  "location" : {
+    "lon":-0.12,
+    "lat":51.50
+  }
+}
+
+# As an array (lon, lat)
+POST bus_stops/_doc
+{
+  "text": "Westminster Station",
+  "location" : [51.54, 0.23]
+}
+
+# As a geohash
+POST bus_stops/_doc
+{
+  "text": "Hyde Park Station",
+  "location" : "gcpvh2bg7sff"
+}
+
 # Create a mapping for restaurants
-DELETE restaurants
+
 PUT restaurants
 {
   "mappings": {
@@ -31,8 +84,7 @@ PUT restaurants
 ## INDEX the restaurants dataset 
 # Copy the contents from https://github.com/madhusudhankonda/elasticsearch-in-action/blob/main/datasets/london_restaurants.txt to here and execute the bulk API call.
 
-
-# Geo bounding 
+# Geo bounding box query
 GET restaurants/_search
 {
   "query": {
@@ -56,6 +108,823 @@ GET restaurants/_search
         }
       }
     }
+    }
+  }
+}
+
+# Geo bounding box query - location lon/lat as an array
+# Note the array takes in lat followed by lon whereas the above query takes the opposite way
+
+GET restaurants/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        }
+      ],
+      "filter": [
+        {
+          "geo_bounding_box": {
+            "location": {
+              "top_left": [ 0.04, 52.00],
+              "bottom_right": [0.08, 49]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+# WKT (well known text)
+GET restaurants/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        }
+      ],
+      "filter": [
+        {
+          "geo_bounding_box": {
+            "location": {
+              "wkt":"BBOX(0.08, 0.04, 52.00, 49.00)"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Geoshapes
+
+PUT cafes
+{
+  "mappings": {
+    "properties": {
+      "name":{
+        "type": "text"
+      },
+      "address": {
+        "type": "geo_shape"
+      }
+    }
+  }
+}
+
+# Indexing a cafe in GeoJSON format
+PUT cafes/_doc/1
+{
+  "name":"Costa Coffee",
+  "address" : {
+    "type" : "Point",
+    "coordinates" : [0.17, 51.57]
+  }
+}
+
+# Indexing a cafe in WKT format
+PUT /cafes/_doc/2
+{
+  "name":"Costa Coffee",
+  "address" : "POINT (0.17 51.57)"
+}
+
+# Geo bounding query on a geo_shape field
+GET cafes/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        }
+      ],
+      "filter": [
+        {
+          "geo_bounding_box": {
+            "address": {
+              "top_left": {
+              "lat": 52.00,
+              "lon": 0.04
+            },
+            "bottom_right": {
+              "lat": 49.00,
+              "lon": 0.20
+            }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+GET restaurants/_search
+#Geo distance query
+GET restaurants/_search
+{
+  "query": {
+    "geo_distance": {
+      "distance": "175 km",
+      "location": {
+        "lat": 50.00,
+        "lon": 0.10
+      }
+    }
+  }
+}
+
+GET cafes/_search
+{
+  "query": {
+    "geo_distance": {
+      "distance": "175 km",
+      "address": {
+        "lat": 50.00,
+        "lon": 0.10
+      }
+    }
+  }
+}
+
+#Geo shape query
+GET cafes/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        }
+      ],
+      "filter": [
+        {
+          "geo_shape": {
+            "address": {
+              "shape": {
+                "type": "envelope",
+                "coordinates": [
+                  [
+                    0.1,
+                    55
+                  ],
+                  [
+                    1,
+                    45
+                  ]
+                ]
+              },
+              "relation": "within"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+#Shape queries
+
+#Mapping for a floor_area field as shape data types
+PUT floors
+{
+  "mappings": {
+    "properties": {
+      "floor_area":{
+        "type": "shape"
+      }
+    }
+  }
+}
+
+# Indexing a point
+PUT floors/_doc/1
+{
+  "floor_area":{
+    "type":"point",
+    "coordinates":[12,14]
+  }
+}
+
+PUT floors/_doc/2
+{
+  "floor_area":{
+    "type":"multipoint",
+    "coordinates":[[12,14],[13,16]]
+  }
+}
+
+
+GET floors/_search
+{
+  "query": {
+    "shape":{
+      "floor_area":{
+        "shape":{
+          "type":"envelope",
+          "coordinates":[[10,16],[14,10]]
+        }
+      }
+    }
+  }
+}
+DELETE myshapes
+#Mapping for a shape field as shape data types
+PUT myshapes
+{
+  "mappings": {
+    "properties": {
+      "name":{
+        "type": "text"
+      },
+      "myshape":{
+        "type": "shape"
+      }
+    }
+  }
+}
+
+# Indexing a point
+PUT myshapes/_doc/1
+{
+  "name":"A point",
+  "myshape":{
+    "type":"point",
+    "coordinates":[12,14]
+  }
+}
+
+# Indexing a multipoint
+PUT myshapes/_doc/2
+{
+  "name":"A multipoint shape",
+  "myshape":{
+    "type":"multipoint",
+    "coordinates":[[12,14],[13,16]]
+  }
+}
+
+# Searching for the shapes in the bounds constructed by the envelope
+GET myshapes/_search
+{
+  "query": {
+    "shape":{
+      "myshape":{
+        "shape":{
+          "type":"envelope",
+          "coordinates":[[10,16],[14,10]]
+        }
+      }
+    }
+  }
+}
+
+# Span queries
+PUT quotes
+{
+  "mappings": {
+    "properties": {
+      "author":{
+        "type": "text"
+      },
+      "quote":{
+        "type": "text"
+      }
+    }
+  }
+}
+
+# Index a quote
+PUT quotes/_doc/1
+{
+  "author":"Isaac Newton",
+  "quote":"Plato is my friend Aristotle is my friend but my greatest friend is truth."
+}
+
+# Fetch the document with the given term in the first n (end) number of spans
+GET quotes/_search
+{
+  "query": {
+    "span_first": {
+      "match": {
+        "span_term": {
+          "quote": "aristotle"
+        }
+      },
+      "end": 5
+    }
+  }
+}
+
+# Span near query 
+GET quotes/_search
+{
+  "query": {
+    "span_near": {
+      "clauses": [
+        {
+          "span_term": {
+            "quote": "plato"
+          }
+        },
+        {
+          "span_term": {
+            "quote":  "aristotle"
+          }
+        }
+      ],
+      "slop": 3, 
+      "in_order": true
+    }
+  }
+}
+
+# Span near query wiht three clauses
+GET quotes/_search
+{
+  "query": {
+    "span_near": {
+      "clauses": [
+        {
+          "span_term": {
+            "quote": "plato"
+          }
+        },
+        {
+          "span_term": {
+            "quote":  "aristotle"
+          }
+        },
+        {
+          "span_term": {
+            "quote":  "truth"
+          }
+        }
+      ],
+      "slop": 20, 
+      "in_order": true
+    }
+  }
+}
+
+# Span within - friend between plato and aristotle
+GET quotes/_search
+{
+  "query": {
+    "span_within": {
+      "little": {
+        "span_term": {
+          "quote": "friend"
+        }
+      },
+      "big": {
+        "span_near": {
+          "clauses": [
+            {
+              "span_term": {
+                "quote": "plato"
+              }
+            },
+            {
+              "span_term": {
+                "quote": "aristotle"
+              }
+            }
+          ],
+          "slop": 3,
+          "in_order": true
+        }
+      }
+    }
+  }
+}
+
+# Span within - aristotle between friend and friend
+GET quotes/_search
+{
+  "query": {
+    "span_within": {
+      "little": {
+        "span_term": {
+          "quote": "aristotle"
+        }
+      },
+      "big": {
+        "span_near": {
+          "clauses": [
+            {
+              "span_term": {
+                "quote": "friend"
+              }
+            },
+            {
+              "span_term": {
+                "quote": "friend"
+              }
+            }
+          ],
+          "slop": 4,
+          "in_order": true
+        }
+      }
+    }
+  }
+}
+
+
+GET quotes/_search
+{
+  "query": {
+    "span_within": {
+      "little": {
+        "span_term": {
+          "quote": "aristotle"
+        }
+      },
+      "big": {
+        "span_near": {
+          "clauses": [
+            {
+              "span_term": {
+                "quote": "friend"
+              }
+            },
+            {
+              "span_term": {
+                "quote": "friend"
+              }
+            },
+            {
+              "span_term": {
+                "quote": "truth"
+              }
+            }
+            
+          ],
+          "slop": 20,
+          "in_order": true
+        }
+      }
+    }
+  }
+}
+
+# Span-or query
+
+GET quotes/_search
+{
+  "query": {
+    "span_or": {
+      "clauses": [
+        {
+          "span_term": {
+            "quote": "plato"
+          }
+        },
+        {
+          "span_term": {
+            "quote": "friend"
+          }
+        },
+        {
+          "span_term": {
+            "quote": "aristotle"
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Specialized queries
+## Distance_feature query for geo_point field
+
+## Creating a universities index with geo_point attribute
+
+PUT universities
+{
+  "mappings": {
+    "properties": {
+      "name":{
+        "type": "text"
+      },
+      "location":{
+        "type": "geo_point"
+      }
+    }
+  }
+}
+
+# Indexing few universities
+PUT universities/_doc/1
+{
+  "name":"London School of Economics (LSE)",
+  "location":[0.1165, 51.5144]
+}
+
+PUT universities/_doc/2
+{
+  "name":"Imperial College London",
+  "location":[0.1749, 51.4988]
+}
+
+PUT universities/_doc/3
+{
+  "name":"University of Oxford",
+  "location":[1.2544, 51.7548]
+}
+
+PUT universities/_doc/4
+{
+  "name":"University of Cambridge",
+  "location":[0.1132, 52.2054]
+}
+
+# Searching for universities nearer to London Bridge - Imperial College
+GET universities/_search
+{
+  "query": {
+    "distance_feature": {
+      "field": "location",
+      "origin": [-0.0860, 51.5048],
+      "pivot": "10 km"
+    }
+  }
+}
+
+# Nearer to Knightsbridge - Imperial college
+GET universities/_search
+{
+  "query": {
+    "distance_feature": {
+      "field": "location",
+      "origin": [0.1604, 51.5016],
+      "pivot": "10 km"
+    }
+  }
+}
+
+## Distance_feature query for date field
+
+# Creating an iPhone index with release_date field
+PUT iphones
+{
+  "mappings": {
+    "properties": {
+      "name":{
+        "type": "text"
+      },
+      "release_date":{
+        "type": "date",
+        "format": "dd-MM-yyyy"
+      }
+    }
+  }
+}
+
+GET iphones/_mapping
+
+# Indexing a few documents
+PUT iphones/_doc/1
+{ 
+  "name":"iPhone",
+  "release_date":"29-06-2007"
+}
+
+PUT iphones/_doc/2
+{
+  "name":"iPhone 12",
+  "release_date":"23-10-2020"
+}
+
+PUT iphones/_doc/3
+{
+  "name":"iPhone 13",
+  "release_date":"24-09-2021"
+}
+
+PUT iphones/_doc/4
+{
+  "name":"iPhone 12 Mini",
+  "release_date":"13-11-2020"
+}
+
+GET iphones/_search
+# Searching for iphones - boost those that were released 30 days around 1st-september-2021
+GET iphones/_search
+{
+  "query": {
+    "distance_feature": {
+      "field": "release_date",
+      "origin": "01-09-2021",
+      "pivot": "30 d"
+    }
+  }
+}
+
+# Searching for iphones - in a bool query (just to see the score)
+GET iphones/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "name": "12"
+          }
+        }
+      ]
+    }
+  }
+}
+
+# Searching for iphones - in a bool query - with a distance_feature should query
+  
+GET iphones/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "name": "12"
+          }
+        }
+      ],
+      "should": [
+        {
+          "distance_feature": {
+            "field": "release_date",
+            "origin": "12-11-2020",
+            "pivot": "2 d"
+          }
+        }
+      ]
+    }
+  }
+}
+
+# More like this query
+
+## More like this query on quotes index
+PUT quotes/_doc/1
+{
+  "autor":"Isaac Newton",
+  "quote":"Plato is my friend Aristotle is my friend but my greatest friend is truth.",
+  "type":"truth"
+}
+
+PUT quotes/_doc/2
+{
+  "autor":"Oscar Wilde",
+  "quote":"The truth is rarely pure and simple",
+  "type":"truth"
+}
+
+PUT quotes/_doc/3
+{
+  "autor":"Mark Twain",
+  "quote":"If you tell the truth, you don't have to remember anything",
+  "type":"truth"
+}
+
+PUT quotes/_doc/4
+{
+  "autor":"Albert Einstien",
+  "quote":"Imagination is more important than Knowledge",
+  "type":"imagination"
+}
+
+PUT quotes/_doc/5
+{
+  "autor":"Muhammed Ali",
+  "quote":"The man who has no imagination has no wings",
+  "type":"imagination"
+}
+
+# More like this search query
+GET quotes/_search
+{
+  "query": {
+    "more_like_this": {
+      "fields": [
+        "type","quote"
+      ],
+      "like": "no imagination has no wings",
+      "min_term_freq": 1,
+      "max_query_terms": 12,
+      "min_doc_freq":1
+    }
+  }
+}
+
+# More like this query on profiles index
+PUT profiles/_doc/1
+{
+  "name":"John Smith",
+  "profile":"John Smith is a capable carpenter"
+}
+
+PUT profiles/_doc/2
+{
+  "name":"John Smith Patterson",
+  "profile":"John Smith Patterson is a pretty plumber"
+}
+
+PUT profiles/_doc/3
+{
+  "name":"Smith Sotherby",
+  "profile":"Smith Sotherby is a gentle painter"
+}
+PUT profiles/_doc/4
+{
+  "name":"Frances Sotherby",
+  "profile":"Frances Sotherby is a gentleman"
+}
+
+# More like this search query
+GET profiles/_search
+{
+  "query": {
+    "more_like_this": {
+      "fields": [
+        "name", "profile"
+      ],
+      "like": "Sotherby",
+      "min_term_freq": 1,
+      "max_query_terms": 12,
+      "min_doc_freq":1
+    }
+  }
+}
+
+# More like this on tech_books 
+PUT tech_books/_doc/1
+{
+  "name":"Effective Java",
+  "tags":["Java","Software engineering", "Programming"]
+}
+
+PUT tech_books/_doc/2
+{
+  "name":"Python crash course",
+  "tags":["Python","Software engineering", "Programming"]
+}
+
+PUT tech_books/_doc/3
+{
+  "name":"Java Core Fundamentals",
+  "tags":["Java","Software"]
+}
+
+# More like this search query
+GET tech_books/_search
+{
+  "query": {
+    "more_like_this": {
+      "fields": [
+        "name","tags"
+      ],
+      "like": "programming",
+      "min_doc_freq": 1, 
+      "min_term_freq": 1,
+      "max_query_terms": 12
+    }
+  }
+}
+
+# More like this query on iphones index
+GET iphones/_search
+{
+  "query": {
+    "more_like_this": {
+      "fields": [
+        "name"
+      ],
+      "like": "12",
+      "min_term_freq": 1,
+      "max_query_terms": 12,
+      "min_doc_freq": 1
+    }
+  }
+}
+
+# Pinned query
+GET iphones/_search
+{
+  "query": {
+    "pinned":{
+      "ids":["1","3"],
+      "organic":{
+        "match":{
+          "name":"12"
+        }
+      }
     }
   }
 }
