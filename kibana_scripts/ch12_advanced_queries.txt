@@ -929,4 +929,240 @@ GET iphones/_search
   }
 }
 
+## More like this query on quotes index
+PUT quotes/_doc/1
+{
+  "autor":"Isaac Newton",
+  "quote":"Plato is my friend Aristotle is my friend but my greatest friend is truth.",
+  "type":"truth"
+}
+
+PUT quotes/_doc/2
+{
+  "autor":"Oscar Wilde",
+  "quote":"The truth is rarely pure and simple",
+  "type":"truth"
+}
+
+PUT quotes/_doc/3
+{
+  "autor":"Mark Twain",
+  "quote":"If you tell the truth, you don't have to remember anything",
+  "type":"truth"
+}
+
+PUT quotes/_doc/4
+{
+  "autor":"Albert Einstien",
+  "quote":"Imagination is more important than Knowledge",
+  "type":"imagination"
+}
+
+PUT quotes/_doc/5
+{
+  "autor":"Muhammed Ali",
+  "quote":"The man who has no imagination has no wings",
+  "type":"imagination"
+}
+
+# More like this search query
+GET quotes/_search
+{
+  "query": {
+    "more_like_this": {
+      "fields": [
+        "type","quote"
+      ],
+      "like": "no imagination has no wings",
+      "min_term_freq": 1,
+      "max_query_terms": 12,
+      "min_doc_freq":1
+    }
+  }
+}
+
+# More like this query on profiles index
+PUT profiles/_doc/1
+{
+  "name":"John Smith",
+  "profile":"John Smith is a capable carpenter"
+}
+
+PUT profiles/_doc/2
+{
+  "name":"John Smith Patterson",
+  "profile":"John Smith Patterson is a pretty plumber"
+}
+
+PUT profiles/_doc/3
+{
+  "name":"Smith Sotherby",
+  "profile":"Smith Sotherby is a gentle painter"
+}
+PUT profiles/_doc/4
+{
+  "name":"Frances Sotherby",
+  "profile":"Frances Sotherby is a gentleman"
+}
+
+# More like this search query
+GET profiles/_search
+{
+  "query": {
+    "more_like_this": {
+      "fields": [
+        "name", "profile"
+      ],
+      "like": "Sotherby",
+      "min_term_freq": 1,
+      "max_query_terms": 12,
+      "min_doc_freq":1
+    }
+  }
+}
+
+# Percolator queries
+PUT tech_books/_doc/1
+{
+  "name":"Effective Java",
+  "tags":["Java","Software engineering", "Programming"]
+}
+
+PUT tech_books/_doc/2
+{
+  "name":"Elasticsearch in Action",
+  "tags":["Elasticsearch","Software engineering", "Programming"]
+}
+
+PUT tech_books/_doc/3
+{
+  "name":"Java Core Fundamentals",
+  "tags":["Java","Software"]
+}
+
+GET tech_books/_search
+{
+  "query": {
+    "match": {
+      "name": "Python"
+    }
+  }
+}
+
+PUT tech_books_percolator
+{
+  "mappings": {
+    "properties": {
+      "query": {
+        "type": "percolator"
+      },
+      "name": {
+        "type": "text"
+      },
+      "tags": {
+        "type": "text"
+      }
+    }
+  }
+}
+
+PUT tech_books_percolator2
+{
+  "mappings": {
+    "properties": {
+      "myquery": {
+        "type": "percolator"
+      },
+      "name": {
+        "type": "text"
+      },
+      "tags": {
+        "type": "text"
+      }
+    }
+  }
+}
+
+
+
+PUT tech_books_percolator2/_doc/1
+{
+  "myquery" : {
+    "match":{
+      "name":"Python"
+    }
+  }
+}
+
+
+PUT tech_books_percolator/_doc/1
+{
+  "query" : {
+    "match":{
+      "name":"Python"
+    }
+  }
+}
+PUT tech_books/_doc/4
+{
+  "name":"Python in Action",
+  "tags":["Python","Software Programming"]
+}
+
+GET tech_books_percolator/_search
+{
+  "query": {
+    "percolate": {
+      "field": "query",
+      "document": {
+        "name":"Python in Action",
+        "tags":["Python","Software Programming"]
+      }
+    }
+  }
+}
+
+GET tech_books_percolator/_search
+{
+  "query": {
+    "percolate": {
+      "field": "query",
+      "document": {
+        "name":"Python in Action"
+      }
+    }
+  }
+}
+
+# More like this search query
+GET tech_books/_search
+{
+  "query": {
+    "more_like_this": {
+      "fields": [
+        "name","tags"
+      ],
+      "like": "programming",
+      "min_doc_freq": 1, 
+      "min_term_freq": 1,
+      "max_query_terms": 12
+    }
+  }
+}
+
+# More like this query on iphones index
+GET iphones/_search
+{
+  "query": {
+    "more_like_this": {
+      "fields": [
+        "name"
+      ],
+      "like": "12",
+      "min_term_freq": 1,
+      "max_query_terms": 12,
+      "min_doc_freq": 1
+    }
+  }
+}
 
