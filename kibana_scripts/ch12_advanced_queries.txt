@@ -645,7 +645,7 @@ PUT universities/_doc/4
   "location":[0.1132, 52.2054]
 }
 
-# Searching for universities nearer to London Bridge - Imperial College
+# Searching for universities nearer to London Bridge - returns LSE
 GET universities/_search
 {
   "query": {
@@ -657,7 +657,7 @@ GET universities/_search
   }
 }
 
-# Nearer to Knightsbridge - Imperial college
+# Nearer to Knightsbridge - returns Imperial college
 GET universities/_search
 {
   "query": {
