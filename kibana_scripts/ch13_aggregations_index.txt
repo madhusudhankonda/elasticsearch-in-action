@@ -1,0 +1,94 @@
+PUT mobile_phones
+{
+  "mappings": {
+    "properties": {
+      "3G": {
+        "type": "boolean"
+      },
+      "4G": {
+        "type": "boolean"
+      },
+      "battery_capacity_mAh": {
+        "type": "long"
+      },
+      "bluetooth": {
+        "type": "boolean"
+      },
+      "brand": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "front_camera": {
+        "type": "long"
+      },
+      "gps": {
+        "type": "boolean"
+      },
+      "id": {
+        "type": "long"
+      },
+      "internal_storage_GB": {
+        "type": "integer"
+      },
+      "model": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "name": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "number_of_sims": {
+        "type": "byte"
+      },
+      "operating_system": {
+        "type": "text"
+      },
+      "price_gbp": {
+        "type": "float"
+      },
+      "price_usd": {
+        "type": "float"
+      },
+      "processor": {
+        "type": "byte"
+      },
+      "ram_memory_mb": {
+        "type": "long"
+      },
+      "rear_camera": {
+        "type": "long"
+      },
+      "resolution_x": {
+        "type": "long"
+      },
+      "resolution_y": {
+        "type": "long"
+      },
+      "screen_size_inches": {
+        "type": "float"
+      },
+      "touchscreen": {
+        "type": "boolean"
+      },
+      "wifi": {
+        "type": "boolean"
+      }
+    }
+  }
+}
