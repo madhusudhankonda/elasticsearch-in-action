@@ -1,1 +1,418 @@
 # Aggregations
+
+PUT tv_sales/_doc/1
+{
+  "brand":"Samsung",
+  "name":"UHD TV",
+  "size_inches":65,
+  "price_gbp":1400,
+  "sales":17
+}
+
+PUT tv_sales/_doc/2
+{
+  "brand":"Samsung",
+  "name":"UHD TV",
+  "size_inches":45,
+  "price_gbp":1000,
+  "sales":11
+}
+
+PUT tv_sales/_doc/3
+{
+  "brand":"Samsung",
+  "name":"UHD TV",
+  "size_inches":23,
+  "price_gbp":999,
+  "sales":14
+}
+
+PUT tv_sales/_doc/4
+{
+  "brand":"LG",
+  "name":"8K TV",
+  "size_inches":65,
+  "price_gbp":1499,
+  "sales":13
+}
+
+PUT tv_sales/_doc/5
+{
+  "brand":"LG",
+  "name":"4K TV",
+  "size_inches":55,
+  "price_gbp":1100,
+  "sales":31
+}
+
+PUT tv_sales/_doc/6
+{
+  "brand":"Philips",
+  "name":"8K TV",
+  "size_inches":65,
+  "price_gbp":1800,
+  "sales":23
+}
+PUT tv_sales/_doc/7
+{
+  "name":"8K TV",
+  "size_inches":65,
+  "price_gbp":2000,
+  "sales":23
+}
+
+## METRIC Aggregations
+
+# Finding the number of documents using value_count metric
+GET tv_sales/_search
+{
+  "size": 0, 
+  "aggs": {
+    "total-values": {
+      "value_count": {
+        "field": "brand.keyword"
+      }
+    }
+  }
+}
+
+# Finding the average price of the mobile
+GET tv_sales/_search
+{
+  "size": 0, 
+  "aggs": {
+    "tv_average_price": {
+      "avg": {
+        "field": "price_gbp"
+      }
+    }
+  }
+}
+
+#Average sales
+
+GET tv_sales/_search
+{
+  "size": 0, 
+  "aggs": {
+    "average_price": {
+      "avg": {
+        "field": "sales"
+      }
+    }
+  }
+}
+
+# Sum of all the TVs
+GET tv_sales/_search
+{
+  "size": 0, 
+  "aggs": {
+    "tv_total_price": {
+      "sum": {
+        "field": "price_gbp"
+      }
+    }
+  }
+}
+
+# Top price of a TV amongst all TVs
+GET tv_sales/_search
+{
+  "aggs": {
+    "tv_top_price": {
+      "min": {
+        "field": "price_gbp"
+      }
+    }
+  }
+}
+
+# Best seller TV (maximum sales)
+GET tv_sales/_search
+{
+  "size": 0, 
+  "aggs": {
+    "tv_sales": {
+      "max": {
+        "field": "sales"
+      }
+    }
+  }
+}
+
+# minimum metric What's the lowest price we have in our index? 
+GET tv_sales/_search
+{
+  "size": 0,
+  "aggs": {
+    "lowest_price": {
+      "min": {
+        "field": "price_gbp"
+      }
+    }
+  }
+}
+
+#All stats
+GET tv_sales/_search
+{
+  "size": 0,
+  "aggs": {
+    "all_stats":{
+      "stats": {
+        "field": "price_gbp"
+      }
+    }
+  }
+}
+
+#Extended stats
+GET tv_sales/_search
+{
+  "size": 0,
+  "aggs": {
+    "extended_stats":{
+      "extended_stats": {
+        "field": "price_gbp"
+      }
+    }
+  }
+}
+
+# Cardinality - unique values of a given field
+GET tv_sales/_search
+{
+  "size": 0,
+  "aggs": {
+    "unique_tvs": {
+      "cardinality": {
+        "field": "brand.keyword"
+      }
+    }
+  }
+}
+
+# BUCKET Aggregations
+
+## To index books, copy : https://github.com/madhusudhankonda/elasticsearch-in-action/blob/main/datasets/books.txt
+
+# Histogram agg
+GET books/_search
+{
+  "size": 0, 
+  "aggs": {
+    "ratings_histogram": {
+      "histogram": {
+        "field": "amazon_rating",
+        "interval": 1
+      }
+    }
+  }
+}
+
+# Histogram on dates - using calendar_interval
+GET books/_search
+{
+  "size":0,
+  "aggs": {
+    "release_date_histogram": {
+      "date_histogram": {
+        "field": "release_date",
+        "calendar_interval": "year"
+      }
+    }
+  }
+}
+
+# Histogram on with one year interval same as the above
+GET books/_search
+{
+  "size":0,
+  "aggs": {
+    "release_date_histogram": {
+      "date_histogram": {
+        "field": "release_date",
+        "calendar_interval": "1y"
+      }
+    }
+  }
+}
+
+# ERROR: Histogram on dates - using calendar_interval with 4q (NOT ALLOWED)
+GET books/_search
+{
+  "size":0,
+  "aggs": {
+    "release_date_histogram": {
+      "date_histogram": {
+        "field": "release_date",
+        "calendar_interval": "4q"
+      }
+    }
+  }
+}
+
+# Histogram on with one a fixed interval of 2 years (730 days)
+GET books/_search
+{
+  "size":0,
+  "aggs": {
+    "release_date_histogram": {
+      "date_histogram": {
+        "field": "release_date",
+        "fixed_interval": "730d"
+      }
+    }
+  }
+}
+
+# Note the bucket key when using calendar_interval as a year vs fixed_interval as 365d:
+
+GET books/_search
+{
+  "size":0,
+  "aggs": {
+    "release_date_histogram": {
+      "date_histogram": {
+        "field": "release_date",
+        "calendar_interval": "1y"
+      }
+    }
+  }
+}
+
+GET books/_search
+{
+  "size":0,
+  "aggs": {
+    "release_date_histogram": {
+      "date_histogram": {
+        "field": "release_date",
+        "fixed_interval": "365d"
+      }
+    }
+  }
+}
+# Child (nested) data historgram
+GET books/_search
+{
+  "size":0,
+  "aggs": {
+    "release_date_histogram": {
+      "date_histogram": {
+        "field": "release_date",
+        "calendar_interval": "1y"
+      },
+      "aggs": {
+        "avg_rating_per_bucket": {
+          "avg": {
+            "field": "amazon_rating"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+# Child (nested) data historgram
+GET tv_sales/_search?size=0
+{
+  "aggs": {
+    "sales_histogram": {
+      "histogram": {
+        "field": "sales",
+        "interval": "10"
+      },
+      "aggs": {
+        "total_sum": {
+          "sum": {
+            "field": "price_gbp"
+          }
+        }
+      }
+    }
+  }
+}
+
+## RANGE aggregation
+GET books/_search
+{
+  "size": 0,
+  "aggs": {
+    "book_ratings_range": {
+      "range": {
+        "field": "amazon_rating",
+        "ranges": [
+          {
+            "from": 1,
+            "to": 4
+          },
+          {
+            "from": 4,
+            "to": 5
+          }
+          
+        ]
+      }
+    }
+  }
+}
+
+# Terms aggregation
+GET books/_search?size=0
+{
+  "aggs": {
+    "author_book_count": {
+      "terms": {
+        "field": "author.keyword"
+      }
+    }
+  }
+}
+
+# Terms aggregation with a custom size
+GET books/_search?size=0
+{
+  "aggs": {
+    "author_book_count": {
+      "terms": {
+        "field": "author.keyword",
+        "size": 25
+      }
+    }
+  }
+}
+
+# Multi-terms: fetching documents with author and title 
+GET books/_search?size=0
+{
+  "aggs": {
+    "author_title_map": {
+      "multi_terms": {
+        "terms": [
+          {
+            "field": "author.keyword"
+          },
+          {
+            "field": "title.keyword"
+          }
+        ]
+      }
+    }
+  }
+}
+
+#Significant terms:
+GET books/_search
+GET books/_search?size=0
+{
+  "aggs": {
+    "NAME": {
+      "significant_terms": {
+        "field": "title.keyword"
+      }
+    }
+  }
+}
