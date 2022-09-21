@@ -416,3 +416,287 @@ GET books/_search?size=0
     }
   }
 }
+
+## Pipeline Aggregations
+
+PUT coffee_sales/_doc/1
+{
+  "date":"2022-09-01",
+  "sales":{
+    "cappuccino":23,
+    "latte":12,
+    "americano":9,
+    "tea":7
+  },
+  "price":{
+    "cappuccino":2.50,
+    "latte":2.40,
+    "americano":2.10,
+    "tea":1.50
+  }
+}
+
+PUT coffee_sales/_doc/2
+{
+  "date":"2022-09-02",
+  "sales":{
+    "cappuccino":40,
+    "latte":16,
+    "americano":19,
+    "tea":15
+  },
+  "price":{
+    "cappuccino":2.50,
+    "latte":2.40,
+    "americano":2.10,
+    "tea":1.50
+  }
+}
+
+# Peak time coffee sales
+PUT peak_coffee_sales/_doc/1
+{
+  "date":"2022-09-01",
+  "hour":7,
+  "sales":{
+    "cappuccino":123,
+    "latte":123,
+    "americano":95,
+    "tea":37
+  }
+}
+
+PUT peak_coffee_sales/_doc/2
+{
+  "date":"2022-09-01",
+  "hour":8,
+  "sales":{
+    "cappuccino":243,
+    "latte":428,
+    "americano":149,
+    "tea":60
+  }
+}
+
+PUT peak_coffee_sales/_doc/3
+{
+  "date":"2022-09-01",
+  "hour":9,
+  "sales":{
+    "cappuccino":199,
+    "latte":132,
+    "americano":85,
+    "tea":34
+  }
+}
+
+PUT peak_coffee_sales/_doc/1
+{
+  "date":"2022-09-02",
+  "hour":7,
+  "sales":{
+    "cappuccino":223,
+    "latte":323,
+    "americano":195,
+    "tea":97
+  }
+}
+
+PUT peak_coffee_sales/_doc/2
+{
+  "date":"2022-09-02",
+  "hour":8,
+  "sales":{
+    "cappuccino":443,
+    "latte":628,
+    "americano":749,
+    "tea":402
+  }
+}
+
+PUT peak_coffee_sales/_doc/3
+{
+  "date":"2022-09-02",
+  "hour":9,
+  "sales":{
+    "cappuccino":328,
+    "latte":272,
+    "americano":192,
+    "tea":93
+  }
+}
+
+# Coffee sales without a pipeline agg:
+GET coffee_sales/_search
+{
+  "size": 0, 
+  "aggs": {
+    "coffee_sales_by_day": {
+      "date_histogram": {
+        "field": "date",
+        "calendar_interval": "1d"
+      },
+      "aggs": {
+        "cappucino_sales": {
+          "sum": {
+            "field": "sales.cappuccino"
+          }
+        }
+      }
+    }
+  }
+}
+
+# Two sigbling aggregations
+GET coffee_sales/_search
+{
+  "size": 0,
+  "aggs": {
+    "coffee_date_histogram": {
+      "date_histogram": {
+        "field": "date",
+        "calendar_interval": "1d"
+      }
+    },
+    "total_sale_of_americanos":{
+      "sum": {
+        "field": "sales.americano"
+      }
+    }
+  }
+}
+
+# Two sigbling aggregations
+GET coffee_sales/_search
+{
+  "size": 0,
+  "aggs": {
+    "coffee_date_histogram": {
+      "date_histogram": {
+        "field": "date",
+        "calendar_interval": "1d"
+      },
+      "aggs": {
+        "total_sum_americano": {
+          "sum": {
+            "field": "price.americano"
+          }
+        },
+        "cum_sum": {
+          "cumulative_sum": {
+            "buckets_path": "total_sum_americano"
+          }
+        }
+      }
+    },
+    "total_sale_of_americanos": {
+      "sum": {
+        "field": "sales.americano"
+      }
+    }
+  }
+}
+
+# Cumulative sum of cappuccinos sold
+GET coffee_sales/_search
+{
+  "size": 0,
+  "aggs": {
+    "sales_by_coffee": {
+      "date_histogram": {
+        "field": "date",
+        "calendar_interval": "1d"
+      },
+      "aggs": {
+        "cappucino_sales": {
+          "sum": {
+            "field": "sales.cappuccino"
+          }
+        },
+        "total_cappuccinos": {
+          "cumulative_sum": {
+            "buckets_path": "cappucino_sales"
+          }
+        }
+      }
+    }
+  }
+}
+
+# Max sum of cappuccinos sold
+GET coffee_sales/_search
+{
+  "size": 0,
+  "aggs": {
+    "sales_by_coffee": {
+      "date_histogram": {
+        "field": "date",
+        "calendar_interval": "1d"
+      },
+      "aggs": {
+        "cappucino_sales": {
+          "sum": {
+            "field": "sales.cappuccino"
+          }
+        }
+      }
+    },
+    "highest_cappucino_sales_bucket":{
+      "max_bucket": {
+        "buckets_path": "sales_by_coffee>cappucino_sales"
+      }
+    }
+  }
+}
+
+# Min sum of cappuccinos sold
+GET coffee_sales/_search
+{
+  "size": 0,
+  "aggs": {
+    "sales_by_coffee": {
+      "date_histogram": {
+        "field": "date",
+        "calendar_interval": "1d"
+      },
+      "aggs": {
+        "cappucino_sales": {
+          "sum": {
+            "field": "sales.cappuccino"
+          }
+        }
+      }
+    },
+    "lowest_cappucino_sales_bucket":{
+      "min_bucket": {
+        "buckets_path": "sales_by_coffee>cappucino_sales"
+      }
+    }
+  }
+}
+
+# Sum of cappuccinos sold
+GET coffee_sales/_search
+{
+  "size": 0,
+  "aggs": {
+    "sales_by_coffee": {
+      "date_histogram": {
+        "field": "date",
+        "calendar_interval": "1d"
+      },
+      "aggs": {
+        "cappucino_sales": {
+          "sum": {
+            "field": "sales.cappuccino"
+          }
+        }
+      }
+    },
+    "top_bucket":{
+      "sum_bucket": {
+        "buckets_path": "sales_by_coffee>cappucino_sales"
+      }
+    }
+  }
+}
