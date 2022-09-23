@@ -16,7 +16,7 @@ Here's the TOC
 ## Disabling XPack Security for 8.x
 By default, 8.x version of Elasticsearch comes with security enabled. For simplicity and not getting the security in our way, we can disable the feature
 
- > ⚠️: **PLEASE DO NOT disable security in PRODUCTION **
+ > :warning ⚠️: **PLEASE DO NOT disable security in PRODUCTION **
 
 Edit config/elasticsearch.yml to add the following property at the end of the file:
 ```xpack.security.enabled: false```
