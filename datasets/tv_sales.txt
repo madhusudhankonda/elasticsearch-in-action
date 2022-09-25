@@ -1,0 +1,19 @@
+PUT tv_sales/_bulk
+{"index":{"_id":"1"}}
+{"brand": "Samsung","name":"UHD TV","size_inches":65,"price_gbp":1400,"sales":17}
+{"index":{"_id":"2"}}
+{"brand":"Samsung","name":"UHD TV","size_inches":45,"price_gbp":1000,"sales":11}
+{"index":{"_id":"3"}}
+{"brand":"Samsung","name":"UHD TV","size_inches":23,"price_gbp":999,"sales":14}
+{"index":{"_id":"4"}}
+{"brand":"LG","name":"8K TV","size_inches":65,"price_gbp":1499,"sales":13}
+{"index":{"_id":"5"}}
+{ "brand":"LG","name":"4K TV","size_inches":55,"price_gbp":1100,"sales":31}
+{"index":{"_id":"6"}}
+{"brand":"Philips","name":"8K TV","size_inches":65,"price_gbp":1800,"sales":23}
+{"index":{"_id":"7"}}
+{"brand":"Philips","name":"8K TV","size_inches":65,"price_gbp":2000,"sales":23}
+{"index":{"_id":"9"}}
+{"brand":"LG","name":"8K TV","size_inches":75,"price_gbp":2000,"sales":48,"best_seller":true}
+{"index":{"_id":"10"}}
+{"brand":"Panasonic", "name":"4K TV","size_inches":75,"price_gbp":2200,"sales":14,"best_seller":false}
