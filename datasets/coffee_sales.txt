@@ -1,0 +1,6 @@
+PUT coffee_sales/_bulk
+{"index":{"_id":"1"}}
+{"date":"2022-09-01","sales":{"cappuccino":23,"latte":12,"americano":9,"tea":7},"price":{"cappuccino":2.50,"latte":2.40,"americano":2.10,"tea":1.50}}
+{"index":{"_id":"2"}}
+{ "date":"2022-09-02","sales":{"cappuccino":40,"latte":16,"americano":19,"tea":15},"price":{"cappuccino":2.50,"latte":2.40,"americano":2.10,"tea":1.50}}
+
