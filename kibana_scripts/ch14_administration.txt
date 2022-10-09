@@ -1,0 +1,113 @@
+# Chapter 14: Adminstration
+
+PUT chats
+{
+  "settings": {
+    "number_of_shards": 1, 
+    "number_of_replicas": 1
+  }
+}
+
+GET _cluster/allocation/explain
+{
+  "index": "chats",
+  "shard": 0,
+  "primary": false
+}
+
+GET chats/_settings
+
+PUT chats/_settings
+{
+  "number_of_replicas": 2
+}
+
+# Register a shanshot - make sure path.repo is set in the elasticsearch.yml file - check Chapter 14
+PUT _snapshot/es_cluster_snapshot_repository
+{
+  "type": "fs",
+  "settings": {
+    "location": "/volumes/es_snapshots"
+  }
+}
+PUT _snapshot/es_cluster_snapshot_repository
+{
+  "type": "fs",
+  "settings": {
+    "location": "/tmp/es_snapshots"
+  }
+}
+
+# Creating a custom snapshot to backup only movies and reviews indices
+PUT _snapshot/es_cluster_snapshot_repository/custom_prod_snapshots
+{
+  "indices": ["*movies*","*reviews*"]
+}
+
+# Taking a snapshot with some metadata
+PUT _snapshot/es_cluster_snapshot_repository/custom_prod_snapshots_with_metadata
+{
+  "indices": ["*movies*","*reviews*", "-*.old"],
+  "metadata":{
+    "reason":"user request",
+    "incident_id":"ID12345",
+    "user":"mkonda"
+  }
+}
+
+# Fetch snapshot repository
+GET _snapshot
+
+# Get the snapshot status
+GET _snapshot/_status
+
+# GEt the status of the current snapshot
+GET _snapshot/es_cluster_snapshot_repository/_current
+
+# Restoring
+
+POST _snapshot/es_cluster_snapshot_repository/custom_prod_snapshots/_restore
+{
+  "indices":["*movies*"]
+}
+
+# DELETE a snapshot
+
+DELETE _snapshot/es_cluster_snapshot_repository/custom_prod_snapshots
+
+
+## SLM
+
+# Creating a daily backup on a few indicies
+PUT _slm/policy/prod_cluster_daily_backups
+{
+  "name":"<prod_daily_backups-{now/d}>",
+  "schedule": "0 0 0 * * ?",
+  "repository": "es_cluster_snapshot_repository",
+  "config": {
+    "indices":["*movies*", "*reviews*"],
+    "include_global_state": false,
+    "ignore_unavailable": false
+  },
+  "retention":{
+    "expire_after":"7d"
+  }
+}
+
+GET _cluster/settings
+
+PUT _cluster/settings
+{
+  "transient": {
+    "logger.org.elasticsearch.index":"DEBUG"
+  }
+}
+
+PUT _cluster/settings
+{
+  "persistent": {
+    "logger.org.elasticsearch.index":"DEBUG",
+    "logger.org.elasticsearch.http":"TRACE"
+  }
+}
+
