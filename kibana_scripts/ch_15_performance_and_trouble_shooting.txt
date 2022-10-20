@@ -1,1 +1,205 @@
 # Performance and Troubleshooting
+
+# Indexing a doc 
+PUT programming_books1/_doc/1
+{
+  "title":"Elasticsearch in Action",
+  "synopsis":"A straightforward, hands-on, example driven, action book"
+}
+# Searching across multiple fields
+GET programming_books1/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "Elasticsearch hands-on example driven",
+      "fields": ["title","synopsis"]
+    }
+  }
+}
+
+# Index with copy_to field
+PUT programming_books2
+{
+  "mappings": {
+    "properties": {
+      "title":{
+        "type": "text",
+        "copy_to": "title_synopsis"
+      },
+      "synopsis":{
+        "type": "binary",
+        "copy_to": "title_synopsis"
+      },
+      "title_synopsis":{
+        "type": "text"
+      }
+    }
+  }
+}
+
+# Indexing a book - only two fields
+PUT programming_books2/_doc/1
+{
+  "title":"Elasticsearch in Action",
+  "synopsis":"A straightforward, hands-on, example driven, action book"
+}
+
+# Match query against the title_synopsis field
+GET programming_books2/_search
+{
+  "query": {
+    "match": {
+      "title_synopsis": {
+        "query": "Elasticsearch hands-on example driven",
+        "operator": "OR"
+      }
+    }
+  }
+}
+
+DELETE programming_books3
+# multi-field mapping
+PUT programming_books3
+{
+  "mappings": {
+    "properties": {
+      "title":{
+        "type": "text",
+        "fields": {
+          "raw":{
+            "type":"keyword"
+          }
+        }
+      }
+    }
+  }
+}
+
+# Indexing a document
+PUT programming_books3/_doc/1
+{
+  "title":"Elasticsearch in Action"
+}
+
+# Searching on a keyword field
+GET programming_books3/_search
+{
+  "query": {
+    "match": {
+      "title.raw": "Elasticsearch in Action"
+    }
+  }
+}
+
+# Custom refresh setting - 1 min
+PUT programming_books3/_settings
+{
+  "index":{
+    "refresh_interval":"1m"
+  }
+}
+
+# Turning off refresh activity completely
+PUT programming_books3/_settings
+{
+  "index":{
+    "refresh_interval":-1
+  }
+}
+
+# Index a sample document
+PUT programming_books3/_doc/10
+{
+  "title":"Elasticsearch for Java Developers",
+  "synopsis":"Elasticsearch meets Java"
+}
+
+# If you search for this - you should return no result.
+# As we switched off the refresh - it shouldn't be available in search
+GET programming_books3/_search
+{
+  "query": {
+    "match": {
+      "title": "Elasticsearch Java"
+    }
+  }
+}
+
+# Forcing refresh on the index
+POST programming_books3/_refresh
+
+# Fetch the hot threads
+GET _nodes/hot_threads
+
+# Fetch all the thread-pools 
+GET _nodes/thread_pool
+
+# Fetch all the thread-pools usign _cat API
+GET /_cat/thread_pool/?v&h=name,active,size,type
+
+GET _cluster/health
+
+# Allocation API
+GET _cluster/allocation/explain
+
+# Allocation explain API on an individual index
+GET _cluster/allocation/explain
+{
+  "index": "programming_books2",
+  "shard": 0,
+  "primary": true,
+  "current_node": "mkmac.local"
+}
+
+# Getting nodes info
+
+## Fetch all nodes
+GET _nodes
+
+GET _nodes/process
+
+GET _cat/nodes?v=true&s=cpu:desc
+
+# Fetching individual node cpu/memory stats
+GET _nodes/stats/os?filter_path=nodes.*.os
+
+# Watermark thresholds
+
+## Chanding the low-watermark
+PUT _cluster/settings
+{
+  "transient": {
+    "cluster.routing.allocation.disk.watermark.low":"80%"
+  }
+}
+
+## Chanding the high watermark
+PUT _cluster/settings
+{
+  "transient": {
+    "cluster.routing.allocation.disk.watermark.high":"85%"
+  }
+}
+
+## Chanding the flood-stage watermark
+PUT _cluster/settings
+{
+  "transient": {
+    "cluster.routing.allocation.disk.watermark.flood_stage":"90%"
+  }
+}
+
+# Setting all thresholds in one-go
+PUT _cluster/settings
+{
+  "transient": {
+    "cluster.routing.allocation.disk.watermark.low":"80%",
+    "cluster.routing.allocation.disk.watermark.high":"85%",
+    "cluster.routing.allocation.disk.watermark.flood_stage":0.90
+  }
+}
+
+GET _cluster/settings
+
+# Fetching circuit breaker settings
+GET _nodes/stats/breaker
