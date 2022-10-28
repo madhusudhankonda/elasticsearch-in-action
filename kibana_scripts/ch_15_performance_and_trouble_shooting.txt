@@ -27,7 +27,7 @@ PUT programming_books2
         "copy_to": "title_synopsis"
       },
       "synopsis":{
-        "type": "binary",
+        "type": "text",
         "copy_to": "title_synopsis"
       },
       "title_synopsis":{
