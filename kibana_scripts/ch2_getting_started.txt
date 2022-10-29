@@ -594,7 +594,7 @@ GET covid/_search
 {
   "size": 0, 
   "aggs": {
-    "total_deaths": {
+    "max_deaths": {
       "max": {
         "field": "deaths"
       }
