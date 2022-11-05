@@ -1,0 +1,121 @@
+# Ingest Pipelines
+
+# Create a pipeline that stamps incoming data with an additional field "confidential"
+PUT _ingest/pipeline/confidential_files_pipeline 
+{
+  "description": "Stamp confidential on the file (document)",
+  "processors": [
+    {
+      "set": {
+        "field": "category",
+        "value": "confidential"
+      }
+    }
+  ]
+}
+
+POST _ingest/pipeline/confidential_files_pipeline/_simulate
+{
+  "docs": [
+    {
+      "_source": {
+        "op_name": "Operation Cobra"
+      }
+    }
+  ]
+}
+
+# Adding another processor to uppercase the newly created field:
+
+PUT _ingest/pipeline/confidential_files_pipeline 
+{
+  "description": "Stamp confidential on the file (document)",
+  "processors": [
+    {
+      "set": {
+        "field": "category",
+        "value": "confidential"
+      },
+      "uppercase": {
+        "field": "category"
+      }
+    }
+  ]
+}
+
+# Testing the modified pipeline second time
+POST _ingest/pipeline/confidential_files_pipeline/_simulate
+{
+  "docs": [
+    {
+      "_source": {
+        "op_name": "Operation Cobra"
+      }
+    }
+  ]
+}
+
+# Create a pipeline that stamps incoming data with an additional field "confidential"
+PUT _ingest/pipeline/confidential_pdf_files_pipeline 
+{
+  "description": "Pipeline to load PDF documents",
+  "processors": [
+    {
+      "set": {
+        "field": "category",
+        "value": "confidential"
+      },
+      "attachment": {
+        "field": "secret_file_data"
+      }
+    }
+  ]
+}
+
+
+POST _ingest/pipeline/confidential_pdf_files_pipeline/_simulate
+{
+  "docs": [
+    {
+      "_source": {
+        "op_name": "Op Konda",
+        "secret_file_data":"U3VuZGF5IEx1bmNoIGF0IEtvbmRhJ3M="
+      }
+    }
+  ]
+}
+
+# Choosing only content metadata as part of attachment
+
+PUT _ingest/pipeline/only_content_pdf_files_pipeline 
+{
+  "description": "Pipeline to load PDF documents",
+  "processors": [
+    {
+      "set": {
+        "field": "category",
+        "value": "confidential"
+      },
+      "attachment": {
+        "field": "secret_file_data",
+        "properties":["content"]
+      }
+    }
+  ]
+}
+
+# Testing the pipeline
+GET _ingest/pipeline/only_content_pdf_files_pipeline/_simulate
+{
+  "docs": [
+    {
+      "_source": {
+        "op_name": "Op Konda",
+        "secret_file_data":"U3VuZGF5IEx1bmNoIGF0IEtvbmRhJ3M="
+      }
+    }
+  ]
+}
+
+
+
