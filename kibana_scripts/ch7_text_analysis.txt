@@ -919,7 +919,7 @@ POST index_with_shingle/_analyze
 
 DELETE index_with_synonyms
 
-
+# Index with a synonyms filter
 PUT index_with_synonyms
 {
   "settings": {
@@ -934,6 +934,7 @@ PUT index_with_synonyms
   }
 }
 
+# Test the index - the output should be "What" "Football"
 POST index_with_synonyms/_analyze
 {
   "text": "What's soccer?",
@@ -941,13 +942,20 @@ POST index_with_synonyms/_analyze
   "filter": ["synonyms_filter"]
 }
 
+# Index with synonyms filter - reading the synonyms from the code itself
+# Thanks to Thomas Hill - he mentioned a mistake in my earlier verion - where the analyzer was set to standard.
+# if you set the type to "standard", then Elasticsearch only looks at the parameters for Standard Analyzer, 
+# such as "stopwords_path". It does NOT look at parameters for a custom analyzer, such as "filter".
+# Thank you @Thomas Hill!
+
 PUT index_with_synonyms_analyzer
 {
   "settings": {
     "analysis": {
       "analyzer": {
         "synonyms_analyzer":{
-          "type":"standard",
+          "type":"custom",
+          "tokenizer":"standard",
           "filter":["synonyms_filter"]
         }
       }
@@ -978,4 +986,44 @@ GET index_with_synonyms/_search
       }
     }
   }
+}
+
+# Synonyms from a file.
+# Note I've set the type to be standard and tested with 8.5 version - it seems working. 
+# Should you have any issues, do change it to "custom" as per previous 
+# comments (see line 946) and try it out. 
+PUT index_with_synonyms_from_file_analyzer
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "synonyms_analyzer":{
+          "type":"standard",
+          "filter":["synonyms_from_file_filter"]
+        }
+      },
+      "filter": {
+        "synonyms_from_file_filter":{
+          "type":"synonym",
+          "synonyms_path":"synonyms.txt" 
+        }
+      }
+    }
+  }
+}
+
+# Create synonyms.txt file:
+# Make sure a file called "synonyms.txt" is created under 
+# $ELASTICSEARCH_HOME/config with the following contents:
+
+# file: synonyms.txt
+important=>imperative
+beautiful=>gorgeous
+
+# Test the filter - should return imperative
+POST index_with_synonyms_from_file_analyzer/_analyze
+{
+  "text": "important",
+  "tokenizer": "standard", 
+  "filter": ["synonyms_from_file_filter"]
 }
