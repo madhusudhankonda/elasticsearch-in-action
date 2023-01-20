@@ -483,7 +483,12 @@ PUT emails
       "attachments":{
         "properties": {
           "filename":{
-            "type":"text"
+            "type":"text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "filetype":{
             "type":"text"
@@ -498,7 +503,7 @@ PUT emails
 
 PUT emails/_doc/1
 {
-  "to:":"johndoe@johndoe.com",
+  "to":"johndoe@johndoe.com",
   "subject":"Testing Object Type",
   "attachments":{
     "filename":"file1.txt",
