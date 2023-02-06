@@ -71,6 +71,9 @@ PUT employees/_mapping
   }
 }
 
+# Create an empty index first
+PUT departments
+
 ## Updating an empty index
 PUT departments/_mapping 
 {
