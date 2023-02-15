@@ -52,13 +52,6 @@ GET _analyze
 
 #Configuring analyzers
 
-POST _analyze
-{
- "text": ["<h1>HEY how are YOU</h1>"],
- "tokenizer": "simple", 
- "filter": ["lowercase"]
-}
-
 PUT my_index_with_stopwords
 {
   "settings": {
@@ -189,6 +182,7 @@ POST _analyze
   "analyzer": "pattern"
 }
 
+# Additional example - a pattern analyzer
 DELETE index_with_pattern_analyzer
 PUT index_with_pattern_analyzer
 {
@@ -204,7 +198,8 @@ PUT index_with_pattern_analyzer
     }
   }
 }
-DELETE index_with_pattern_analyzer4
+
+# Dash pattern
 PUT index_with_dash_pattern_analyzer
 {
   "settings": {
