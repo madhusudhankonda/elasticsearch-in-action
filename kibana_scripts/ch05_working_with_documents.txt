@@ -60,6 +60,51 @@ PUT _cluster/settings
   }
 }
 
+# Using multi-get (_mget) API to get multiple docs
+GET movies/_mget
+{
+  "ids" : ["1", "12", "19", "34"]
+}
+
+# Check if doc exists
+HEAD movies/_doc/1
+
+# Fetching docs from multiple indices using _mget endpoint
+GET _mget 
+{
+  "docs":[
+   {
+     "_index":"classic_movies", 
+     "_id":11
+   },
+   {
+     "_index":"international_movies", 
+     "_id":22
+   },
+   {
+     "_index":"top100_movies",  
+     "_id":33
+   }
+  ]
+}
+
+# Use ids query to fetch multiple documents 
+GET classic_movies/_search
+{
+  "query": {
+    "ids": {
+      "values": [1,2,3,4]
+    }
+  }
+}
+
+# Fething multiple docs from multiple indices
+GET classic_movies,international_movies/_search 
+{ 
+  # body
+} 
+
+########----
 ## Updating documents
 
 ### Adding new fields
