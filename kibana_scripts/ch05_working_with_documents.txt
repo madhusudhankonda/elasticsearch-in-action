@@ -26,6 +26,39 @@ POST movies_reviews/_doc
   "remarks":"The movie started with a ..."
 }
 
+# Movie with an ID
+POST movies/_doc/1
+{
+  "movie":"The Godfather",
+}
+
+#A Not a movie but a tweet - overriding existing movie
+PUT movies/_doc/1 
+{
+  "tweet":"Elasticsearch in Action 2e is here!"
+}
+
+# Using _create endpoint to avoid overriding. 
+# First create a movie with ID 100
+PUT movies/_create/100
+{
+  "title":"Mission Impossible",
+  "director":"James Cameron"
+}
+
+#Now, index a tweet in place of an existing movie - this op should fail
+PUT movies/_create/100 
+{
+  "tweet":"A movie with popcorn is so cool!"
+}
+
+# Stop auto creation of indices
+PUT _cluster/settings
+{
+  "persistent": {
+    "action.auto_create_index": "false" 
+  }
+}
 
 ## Updating documents
 
