@@ -1,14 +1,6 @@
 ## 
 ## A handy scripts file for hands-on exercises on Kibana
 ## Copy the whole contents of this file to Kibana's DevTools
-
-## If you wish to follow the running commentary for these scripts, 
-## follow the Ch2 Getting Started wiki page here: https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-5.-Document-Operations
-##
-## Please let me know if you find any issues with this script
-
-## Indexing Documents
-
 ### Indexing a movie document with an identifier:
 
 PUT movies/_doc/1
@@ -104,8 +96,7 @@ GET classic_movies,international_movies/_search
   # body
 } 
 
-########----
-## Updating documents
+# Updating documents
 
 ### Adding new fields
 POST movies/_update/1
@@ -368,6 +359,18 @@ POST movies/_bulk
 {"title": "Mission Impossible III","release_date": "2006-05-03"}
 {"index":{}} 
 {"title": "Mission Impossible - Ghost Protocol","release_date": "2011-12-26"}
+
+# Create Rush Hour Movie
+POST _bulk
+{"index":{"_index":"movies","_id":"200"}}
+{"doc": {"director":"Brett Ratner"}}
+
+# Update the Rush Hour movie
+POST _bulk
+{"update":{"_index":"movies","_id":"200"}}
+{"doc": {"director":"Brett Ratner", "actors":["Jackie Chan","Chris Tucker"]}}
+
+
 
 ## Multiple entities
 
