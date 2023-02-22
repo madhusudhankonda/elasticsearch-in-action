@@ -183,20 +183,8 @@ PUT classic_movies
     }
   }
 }
-PUT classic_movies2
-{
-  "mappings": {
-    "properties": {
-      "title": {
-        "type": "text"
-      },
-      "director": {
-        "type": "keyword"
-      }
-    }
-  }
-}
 
+# Index three docs
 PUT classic_movies/_doc/1
 {
   "title":"Jaws",
@@ -215,26 +203,22 @@ PUT classic_movies/_doc/3
   "director":"Steven Spielberg"
 }
 
-PUT classic_movies2/_doc/4
-{
-  "title":"Schindler's List",
-  "director":"Steven Spielberg"
-}
-
-
+# Search for terms with director matching with the "path" value 
+# from "classic_movies" index for a document with an ID as 3 (which is "Steven Spielberg)
 GET classic_movies/_search
 {
   "query": {
     "terms": {
       "director": {
-        "index":"classic_movies2",
-        "id":"4",
+        "index":"classic_movies",
+        "id":"3",
         "path":"director"
       }
     }
   }
 }
 
+# This query to fetches two movies directored by Speilberg
 
 # IDs query
 GET movies/_search
@@ -316,6 +300,7 @@ GET movies/_search
   }
 }
 
+# Fetch movies after 1970 and sort them in asc order
 GET movies/_search
 {
   "query": {
@@ -335,23 +320,62 @@ GET movies/_search
 }
 
 # Range query with date math
+# Before 13th Feb 1995
 GET movies/_search
 {
   "query": {
     "range": {
       "release_date": {
-        "lte": "15-02-1995||+2d"
+        "lte": "15-02-1995||-2d"
       }
     }
   }
 }
-# Range query with date match using now 
+
+# Released after 3rd march 2019
 GET movies/_search
 {
   "query": {
     "range": {
       "release_date": {
-        "lte": "now+1y"
+        "gte": "01-03-2019||-2d" 
+      }
+    }
+  }
+}
+# Before 15-March-2022
+GET movies/_search
+{
+  "query": {
+    "range": {
+      "release_date": {
+        "lte": "17-03-2022||-2d"
+      }
+    }
+  }
+}
+
+# Range query with date match using now 
+# Movies from last 4 years
+GET movies/_search
+{
+  "query": {
+    "range": {
+      "release_date": {
+        "gte": "now-4y"
+      }
+    }
+  }
+}
+
+# Between now and 4 years ago
+GET movies/_search
+{
+  "query": {
+    "range": {
+      "release_date": {
+        "gte": "now-4y",
+        "lte":"now"
       }
     }
   }
