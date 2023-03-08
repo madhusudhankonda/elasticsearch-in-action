@@ -318,7 +318,7 @@ GET movies/_search
   "_source": false, 
   "query": {
     "match": {
-      "title": "Lords"
+      "title": "Lord"
     }
   }
 }
