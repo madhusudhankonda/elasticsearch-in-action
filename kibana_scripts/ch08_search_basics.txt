@@ -150,7 +150,7 @@ GET movies/_search?q=title:Godfather
 GET movies/_search?q=title:Godfather Knight Shawshank
 
 #Fetch a specific title AND an actor combination
-GET movies/_search?q=title:Knight actors:Bale
+GET movies/_search?q=title:Knight AND actors:Bale
 
 #Fetch a specific title OR an actor combination
 GET movies/_search?q=title:Godfather actors:Bale
