@@ -1,10 +1,7 @@
 ## Compound Queries
 
-# Create products schema
-
-# Index products using bulk API
-
-# Advanced search: compound queries
+# Create products schema is here:
+# https://github.com/madhusudhankonda/elasticsearch-in-action/blob/main/datasets/products_mapping.txt
 
 # Create products schema
 PUT products
@@ -99,7 +96,7 @@ PUT products
   }
 }
 # Index products using bulk API
-
+# Prodcuts data is here: https://github.com/madhusudhankonda/elasticsearch-in-action/blob/main/datasets/products.txt
 
 # Searching for TVs using bool query
 GET products/_search
@@ -334,7 +331,7 @@ GET products/_search
   "_source": ["product","brand"], 
   "query": {
     "bool": {
-      "must": [
+      "must": [#A
         {
           "match": {
             "product": "TV"
@@ -345,28 +342,13 @@ GET products/_search
             "brand": "LG"
           }
         }
-      ],
-      "should": [
-        {
-          "range": {
-            "price": {
-              "gte": 500,
-              "lte": 1000
-            }
-          }
-        },
-        {
-          "match_phrase_prefix": {
-            "overview": "4k ultra hd"
-          }
-        }
+
       ]
     }
   }
 }
 
-
-# Adding should clause boosts the score 
+# Now, let's add the shoud clause - adding should clause boosts the score 
 GET products/_search
 {
   "_source": ["product","brand","overview", "price"], 
