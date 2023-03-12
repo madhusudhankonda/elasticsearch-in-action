@@ -1,0 +1,26 @@
+# Create a mapping for restaurants
+PUT restaurants
+{
+  "mappings": {
+    "properties": {
+      "name":{
+        "type": "text"
+      },
+      "town_centre":{
+        "type": "geo_point"
+      },
+      "location":{
+        "type": "geo_point"
+      },
+      "category":{
+        "type":"text"
+      },
+      "hygenie_rating":{
+        "type": "short"
+      },
+      "borough":{
+        "type":"text"
+      }
+    }
+  }
+}
