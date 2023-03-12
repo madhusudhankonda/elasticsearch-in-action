@@ -29,7 +29,7 @@ POST bus_stops/_doc
   "location" : "POINT (51.49 0.14)" 
 }
 
-# As WKT point
+# As location object
 POST bus_stops/_doc
 {
   "text": "Leciester Square Station",
@@ -54,7 +54,6 @@ POST bus_stops/_doc
 }
 
 # Create a mapping for restaurants
-
 PUT restaurants
 {
   "mappings": {
@@ -83,6 +82,25 @@ PUT restaurants
 
 ## INDEX the restaurants dataset 
 # Copy the contents from https://github.com/madhusudhankonda/elasticsearch-in-action/blob/main/datasets/london_restaurants.txt to here and execute the bulk API call.
+
+# Matching restaurant locations in a georectangle using geo_bounding_box query
+GET restaurants/_search
+{
+  "query": {
+    "geo_bounding_box": {
+      "location": {
+        "top_left": { 
+          "lat": 52,
+          "lon": 0.2
+        },
+        "bottom_right": { 
+          "lat": 49,
+          "lon": 0.1
+        }
+      }
+    }
+  }
+}
 
 # Geo bounding box query
 GET restaurants/_search
