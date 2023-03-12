@@ -212,6 +212,25 @@ PUT /cafes/_doc/2
   "address" : "POINT (0.17 51.57)"
 }
 
+# Matching restaurants in a georectangle
+GET restaurants/_search
+{
+  "query": {
+    "geo_bounding_box": {
+      "location": {
+        "top_left": { 
+          "lat": 52,
+          "lon": 0.2
+        },
+        "bottom_right": { 
+          "lat": 49,
+          "lon": 0.1
+        }
+      }
+    }
+  }
+}
+
 # Geo bounding query on a geo_shape field
 GET cafes/_search
 {
@@ -241,6 +260,30 @@ GET cafes/_search
     }
   }
 }
+
+# Geoquery with location represented as WKT 
+GET restaurants/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        }
+      ],
+      "filter": [
+        {
+          "geo_bounding_box": {
+            "location": {
+              "wkt":"BBOX(0.08, 0.04, 52.00, 49.00)"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
 
 GET restaurants/_search
 #Geo distance query
@@ -1083,35 +1126,6 @@ PUT tech_books_percolator
     }
   }
 }
-
-PUT tech_books_percolator2
-{
-  "mappings": {
-    "properties": {
-      "myquery": {
-        "type": "percolator"
-      },
-      "name": {
-        "type": "text"
-      },
-      "tags": {
-        "type": "text"
-      }
-    }
-  }
-}
-
-
-
-PUT tech_books_percolator2/_doc/1
-{
-  "myquery" : {
-    "match":{
-      "name":"Python"
-    }
-  }
-}
-
 
 PUT tech_books_percolator/_doc/1
 {
