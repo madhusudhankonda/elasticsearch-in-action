@@ -803,37 +803,6 @@ GET products/_search
   }
 }
 
-# Disjunction Maximum (dis-max)
-GET products2/_search
-{
-  "_source": ["type","overview","tech_spec"], 
-  "query": {
-    "dis_max": {
-      "queries": [{
-        "match": {
-          "type": "smart tv"
-        }
-      },
-      {
-        "match": {
-          "overview": "smart tv"
-        }
-      },
-      {
-        "match": {
-          "tech_spec": "smart tv"
-        }
-      }]  
-    }
-  },"highlight": {
-    "fields": {
-      "tech_spec": {},
-      "overview": {},
-      "type": {}
-    }
-  }
-}
-
 # Term search with a bog-standard term query - see the score:1.6376086
 GET products/_search
 {
