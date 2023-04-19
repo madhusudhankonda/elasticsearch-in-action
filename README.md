@@ -6,7 +6,7 @@ The [book's accompanying wiki pages](https://github.com/madhusudhankonda/elastic
 Here's the TOC
 
 1. Overview
-2. [Getting Started](https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-2:-Getting-Started)
+2. [Getting Started](https://github.com/madhusudhankonda/elasticsearch-in-action/blob/babeea237dcc77f1d74f734e750347420e64ddc3/kibana_scripts/ch02_getting_started.txt)
 2. [Architecture](https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-3:-Architecture)
 4. [Mapping](https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-4.-Mapping)
 5. [Working with Documents](https://github.com/madhusudhankonda/elasticsearch-in-action/wiki/Ch-5.-Document-Operations)
