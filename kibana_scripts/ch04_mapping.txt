@@ -514,8 +514,8 @@ PUT emails/_doc/1
 GET emails/_search
 {
   "query": {
-    "term": {
-      "attachments.filename.keyword": "file1.txt"
+    "match": {
+      "attachments.filename": "file1.txt"
     }
   }
 }
