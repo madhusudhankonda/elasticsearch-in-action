@@ -64,7 +64,7 @@ PUT employees/_mapping
   "properties":{
     "joining_date":{ 
       "type":"date",
-      "format":"dd-mm-yyyy"
+      "format":"dd-MM-yyyy"
     },
     "phone_number":{
       "type":"keyword"
