@@ -9,6 +9,7 @@
 ##
 ## Indexing a document for first time
 
+
 PUT movies/_doc/1
 {
   "title":"Godfather",
