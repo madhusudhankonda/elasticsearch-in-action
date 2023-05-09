@@ -733,7 +733,6 @@ PUT tech_books
   }
 }
 
-
 #Indexing a few books:
 
 PUT tech_books4/_doc/1
@@ -763,6 +762,29 @@ GET tech_books4/_search
     }
   }
 }
+
+
+# _index_prefix produces edge n-grams - [e, el, ela, elas, elast, elasti, elastic]
+GET tech_books4/_analyze
+{
+  "field": "title._index_prefix",
+  "text": ["Elastic"]
+}
+
+# 2gram produces two tokens - [elaticsearch, in],[in, action]
+GET tech_books4/_analyze
+{
+  "field": "title._2gram",
+  "text": ["Elasticsearch in Action"]
+}
+
+# 3gram produces three tokens - [elaticsearch, for, java],[for, java, developers]
+GET tech_books4/_analyze
+{
+  "field": "title._3gram",
+  "text": ["Elasticsearch for Java Developers"]
+}
+
 
 # This query should return the Elasticsearch in Action and Elastic Stack in Action books.
 ## Multi types
