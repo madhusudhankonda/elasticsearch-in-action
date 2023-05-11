@@ -34,11 +34,11 @@ PUT movies/_doc/1
 # First create a movie with ID 100
 PUT movies/_create/100
 {
-  "title":"Mission Impossible",
-  "director":"James Cameron"
+  "title":"Mission: Impossible",
+  "director":"Brian De Palma"
 }
 
-#Now, index a tweet in place of an existing movie - this op should fail
+# Now, index a tweet in place of an existing movie - this op should fail
 PUT movies/_create/100 
 {
   "tweet":"A movie with popcorn is so cool!"
@@ -90,7 +90,7 @@ GET classic_movies/_search
   }
 }
 
-# Fething multiple docs from multiple indices
+# Fetching multiple docs from multiple indices
 GET classic_movies,international_movies/_search 
 { 
   # body
@@ -102,8 +102,8 @@ GET classic_movies,international_movies/_search
 POST movies/_update/1
 {
   "doc": {
-    "actors":["Marldon Brando","Al Pacino","James Cann"],
-    "director":"Frances Ford Coppola"  
+    "actors":["Marlon Brando","Al Pacino","James Caan"],
+    "director":"Francis Ford Coppola"  
   }
 }
 
@@ -121,7 +121,7 @@ GET movies/_doc/1
 POST movies/_update/1
 {
   "doc": {
-    "actors":["Marldon Brando","Al Pacino","James Cann", "Robert Duvall"]
+    "actors":["Marlon Brando","Al Pacino","James Caan", "Robert Duvall"]
   }
 }
 
