@@ -569,14 +569,14 @@ GET coffee_sales/_search
         "calendar_interval": "1d"
       },
       "aggs": {
-        "cappucino_sales": {
+        "cappuccino_sales": {
           "sum": {
             "field": "sales.cappuccino"
           }
         },
         "total_cappuccinos": {
           "cumulative_sum": {
-            "buckets_path": "cappucino_sales"
+            "buckets_path": "cappuccino_sales"
           }
         }
       }
@@ -595,16 +595,16 @@ GET coffee_sales/_search
         "calendar_interval": "1d"
       },
       "aggs": {
-        "cappucino_sales": {
+        "cappuccino_sales": {
           "sum": {
             "field": "sales.cappuccino"
           }
         }
       }
     },
-    "highest_cappucino_sales_bucket":{
+    "highest_cappuccino_sales_bucket":{
       "max_bucket": {
-        "buckets_path": "sales_by_coffee>cappucino_sales"
+        "buckets_path": "sales_by_coffee>cappuccino_sales"
       }
     }
   }
