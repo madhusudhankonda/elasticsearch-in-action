@@ -1,6 +1,7 @@
-# Show the love - give me a star!
+# Give me a star if you love this repo!
 
-<img width="769" alt="image" src="https://github.com/madhusudhankonda/elasticsearch-in-action/assets/1698230/4f112b72-6271-4868-a68a-ccb5f5a6d8b0">
+<img width="757" alt="image" src="https://github.com/madhusudhankonda/elasticsearch-in-action/assets/1698230/399df16e-27c8-4fc3-9cd1-305ae320006a">
+
 
 # elasticsearch-in-action
 [Elasticsearch in Action (second edition) Book](https://www.manning.com/books/elasticsearch-in-action-second-edition?utm_source=mkonda&utm_medium=affiliate&utm_campaign=book_konda_elasticsearch_7_23_21&a_aid=mkonda&a_bid=edbc50d4)
